@@ -1,0 +1,9 @@
+{
+    "jshint.exclude": {
+    
+    },
+    "search.exclude": {
+        "package-lock.json": true
+    },
+    "debug.javascript.autoAttachFilter": "always"
+}

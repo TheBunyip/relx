@@ -1,0 +1,5 @@
+{
+    "esversion": 11,
+    "eqeqeq": true,
+    "node": true
+}
