@@ -4,15 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsc-watch --outDir ./build --onSuccess \"node ./build/demo.js\"",
-    "start": "node build/demo.js",
+    "dev:actions": "tsc-watch --outDir ./build --onSuccess \"node ./build/demo/actions.js\"",
+    "dev:circumstances": "tsc-watch --outDir ./build --onSuccess \"node ./build/demo/cirumstances.js\"",
+    "dev:relationships": "tsc-watch --outDir ./build --onSuccess \"node ./build/demo/relationships.js\"",
     "build": "tsc -p ."
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "array-to-sentence": "^2.0.0"
+    "@types/pluralize": "^0.0.29",
+    "array-to-sentence": "^2.0.0",
+    "pluralize": "^8.0.0"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.2",
