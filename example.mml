@@ -1,0 +1,25 @@
+<m-action name="taking" subject="character" object="touchable" oncheck="" oncarryout="" onreport=""></m-action>
+
+<m-action name="taking" subject="character" object="touchable"></m-action>
+
+<m-relationship name="supporting" order="one-to-many" subject="supporter" object="carryable"></m-relationship>
+
+<m-thing name="table" tags="strong supporter visible flammable touchable"></m-thing>
+
+<m-thing name="bob" tags="character visible touchable"></m-thing>
+
+<m-circumstance name="bob-taking-table" subject="bob" action="taking" object="table"></m-circumstance>
+
+<m-circumstance name="subject-holding-something" relationship="holding" object="something"></m-circumstance>
+
+<m-circumstance name="taking-something-while-holding" subject="character" action="taking" object="anything"
+  when="subject-holding-something"></m-circumstance>
+
+<m-rule name="prevent-pickup-when-holding" circumstance="bob" ontriggered="pickupPreventedWhenHolding()"></m-rule>
+
+
+<script>
+  function pickupPreventedWhenHolding(subject, object, secondObject) {
+    console.log(`${subject.name} cannot pick up ${object.name} while holding something`);
+  }
+</script>

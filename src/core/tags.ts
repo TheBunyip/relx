@@ -8,7 +8,7 @@ export type Tag = Symbol;
 // };
 
 export function get(name: string): Tag {
-    return Symbol.for(name) || Symbol(name);
+  return Symbol.for(name) || Symbol(name);
 }
 
-export const Something = get('Something');
+export const Something = get("something");

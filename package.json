@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:actions": "tsc-watch --outDir ./build --onSuccess \"node ./build/demo/actions.js\"",
-    "dev:circumstances": "tsc-watch --outDir ./build --onSuccess \"node ./build/demo/cirumstances.js\"",
-    "dev:relationships": "tsc-watch --outDir ./build --onSuccess \"node ./build/demo/relationships.js\"",
+    "dev:actions": "tsc-watch --onSuccess \"node ./build/demos/actions.js\"",
+    "dev:circumstances": "tsc-watch --onSuccess \"node ./build/demos/cirumstances.js\"",
+    "dev:relationships": "tsc-watch --onSuccess \"node ./build/demos/relationships.js\"",
+    "dev": "tsc-watch",
     "build": "tsc -p ."
   },
   "keywords": [],
