@@ -1,7 +1,7 @@
 import { Action } from "./actions";
 import {
   RelationshipDefinition,
-  exists as relationshipExists,
+  find as findRelationship,
 } from "./relationships";
 import { Something, Tag } from "./tags";
 import { Thing } from "./things";
@@ -63,7 +63,7 @@ export function allows(current: Context, expected: Context): boolean {
   }
   if (expected.relationship && current.subject) {
     if (
-      !relationshipExists(
+      !findRelationship(
         current.subject,
         expected.relationship.type,
         expected.object

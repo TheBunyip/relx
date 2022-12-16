@@ -4,11 +4,14 @@ import { Thing, removeRelationship } from "../../core/things";
 import {
   define as defineRelationship,
   make as makeRelationship,
-  exists as relationshipExists,
+  find as findRelationship,
   allowed as relationshipAllowed,
   RelationshipOrder,
 } from "../../core/relationships";
-import { define, check } from "../../core/actions";
+import {
+  define as defineAction,
+  check as checkAction,
+} from "../../core/actions";
 
 // tags relating to the physical world
 export const tags = {
@@ -27,53 +30,53 @@ export const tags = {
 
 // define some relationship types
 export const relationships = {
-  carrying: defineRelationship(
+  ...defineRelationship(
     tags.character,
     "carrying",
     RelationshipOrder.OneToMany,
     tags.carryable,
-    "carried by"
+    "carriedBy"
   ),
-  holding: defineRelationship(
+  ...defineRelationship(
     tags.character,
     "holding",
     RelationshipOrder.OneToOne,
     tags.carryable,
-    "held by"
+    "heldBy"
   ),
-  supporting: defineRelationship(
+  ...defineRelationship(
     tags.supporter,
     "supporting",
     RelationshipOrder.OneToMany,
     tags.carryable,
-    "supported by"
+    "supportedBy"
   ),
-  containing: defineRelationship(
+  ...defineRelationship(
     tags.container,
     "containing",
     RelationshipOrder.OneToMany,
     Something,
-    "contained by"
+    "containedBy"
   ),
-  viewing: defineRelationship(
+  ...defineRelationship(
     tags.visible,
     "viewing",
     RelationshipOrder.ManyToMany,
     tags.character,
-    "viewed by"
+    "viewedBy"
   ),
-  touching: defineRelationship(
+  ...defineRelationship(
     tags.character,
     "touching",
     RelationshipOrder.ManyToMany,
     tags.touchable,
-    "touched by"
+    "touchedBy"
   ),
 };
 
 export const actions = {
   // define some basic actions
-  taking: define(
+  taking: defineAction(
     tags.character,
     "take",
     tags.touchable,
@@ -82,7 +85,7 @@ export const actions = {
     carryOutTakeAction
   ),
 
-  holding: define(
+  holding: defineAction(
     tags.character,
     "hold",
     tags.touchable,
@@ -91,13 +94,22 @@ export const actions = {
     carryOutHoldAction
   ),
 
-  dropping: define(
+  dropping: defineAction(
     tags.character,
     "drop",
     Something,
     undefined,
     checkDropAction,
     carryOutDropAction
+  ),
+
+  puttingOnto: defineAction(
+    tags.character,
+    "put onto",
+    tags.carryable,
+    tags.supporter,
+    checkPutOntoAction,
+    carryOutPutOntoAction
   ),
 };
 
@@ -107,36 +119,18 @@ function checkTakeAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
     return false;
   }
 
-  // if (relationshipExists(subject, relationships.carrying.type, { noun })) {
-  //   log(`${subject.name} already has ${noun.name}`);
-  //   return false;
-  // }
-
   if (!noun.kinds.has(tags.carryable)) {
     log(`${noun.name} cannot be carried`);
     return false;
   }
 
   return relationshipAllowed(subject, relationships.carrying, noun, log);
-  // });
-  // if (carriedBy) {
-  //   if (carriedBy.otherThing.name === subject.name) {
-  //     log(`${subject.name} already has ${noun.name}`);
-  //   } else {
-  //     log(`${carriedBy.otherThing.name} already has ${noun.name}`);
-  //   }
-  //   return false;
-  // }
-
-  // return true;
 }
 
 function carryOutTakeAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
   if (noun) {
+    removeRelationship(noun, relationships.supportedBy);
     makeRelationship(subject, relationships.carrying, noun, log);
-    return true;
-  } else {
-    return false;
   }
 }
 
@@ -149,24 +143,21 @@ function checkHoldAction(
     log(`${subject.name} cannot hold nothing`);
     return false;
   }
-  if (relationshipExists(subject, relationships.holding.type, { noun })) {
+  if (findRelationship(subject, relationships.holding.type, { noun })) {
     log(`${subject.name} already holding ${noun.name}`);
     return false;
   }
-  if (!relationshipExists(subject, relationships.carrying.type, { noun })) {
+  if (!findRelationship(subject, relationships.carrying.type, { noun })) {
     log(`${subject.name} cannot hold ${noun.name} without carrying it first`);
     return false;
   }
-  check("hold", subject, noun, secondNoun);
+  checkAction("hold", subject, noun, secondNoun);
   return true;
 }
 
 function carryOutHoldAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
   if (noun) {
     makeRelationship(subject, relationships.holding, noun, log);
-    return true;
-  } else {
-    return false;
   }
 }
 
@@ -179,7 +170,7 @@ function checkDropAction(
     log(`${subject.name} cannot drop nothing`);
     return false;
   }
-  if (!relationshipExists(subject, relationships.carrying.type, { noun })) {
+  if (!findRelationship(subject, relationships.carrying.type, { noun })) {
     log(`${subject.name} cannot drop ${noun.name} without carrying it first`);
     return false;
   }
@@ -189,8 +180,37 @@ function checkDropAction(
 function carryOutDropAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
   if (noun) {
     removeRelationship(subject, relationships.carrying, noun);
-    return true;
-  } else {
+  }
+}
+
+function checkPutOntoAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
+  if (!noun) {
+    log(`${subject.name} cannot put nothing onto anything`);
     return false;
+  }
+
+  if (!secondNoun) {
+    log(`${subject.name} cannot put ${noun.name} onto nothing`);
+    return false;
+  }
+
+  if (!findRelationship(subject, relationships.carrying.type, { noun })) {
+    log(
+      `${subject.name} cannot put ${noun.name} onto ${secondNoun.name} without carrying it first`
+    );
+    return false;
+  }
+
+  return true;
+}
+
+function carryOutPutOntoAction(
+  subject: Thing,
+  noun?: Thing,
+  secondNoun?: Thing
+) {
+  if (noun && secondNoun) {
+    removeRelationship(subject, relationships.carrying, noun);
+    makeRelationship(secondNoun, relationships.supporting, noun);
   }
 }

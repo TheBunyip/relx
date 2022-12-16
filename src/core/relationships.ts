@@ -19,7 +19,7 @@ export type RelationshipDefinition = {
   subjectTag: Tag;
   objectTag: Tag;
   order: RelationshipOrder;
-  reversedType: RelationshipType;
+  reversed?: RelationshipDefinition;
 };
 
 // This represents a concrete type that has been made
@@ -34,14 +34,23 @@ export function define(
   order: RelationshipOrder,
   objectTag: Tag,
   reversedName: string
-): RelationshipDefinition {
-  return {
+) {
+  // actually defines a pair
+  const relationship: RelationshipDefinition = {
     type: getTag(name),
     subjectTag,
     objectTag,
     order,
-    reversedType: getTag(reversedName),
   };
+  const reversed: RelationshipDefinition = {
+    type: getTag(reversedName),
+    subjectTag: objectTag,
+    objectTag: subjectTag,
+    order: getReversedRelationshipOrder(order),
+  };
+  relationship.reversed = reversed;
+  reversed.reversed = relationship;
+  return { [name]: relationship, [reversedName]: reversed };
 }
 
 export function make(
@@ -85,7 +94,7 @@ export function allowed(
   if (relationship.order === RelationshipOrder.OneToMany) {
     // the object can only have this relationship with one subject
     const o = object.relationships.filter(
-      (r) => r.type === relationship.reversedType
+      (r) => r.type === relationship.reversed!.type
     );
     if (o.length > 0) {
       onFail?.(
@@ -109,7 +118,7 @@ export function allowed(
   return true;
 }
 
-export function exists(
+export function find(
   subject: Thing,
   relationshipType: RelationshipType,
   object?: ObjectContext
@@ -153,11 +162,17 @@ export function describe(thing: Thing, relationship: Relationship): string {
   return `${thing.name} is currently ${name} ${relationship.otherThing.name}`;
 }
 
-// function getReversedRelationshipOrder(order: RelationshipOrder): RelationshipOrder {
-//     switch (order) {
-//         case RelationshipOrder.OneToOne: return RelationshipOrder.OneToOne;
-//         case RelationshipOrder.OneToMany: return RelationshipOrder.ManyToOne;
-//         case RelationshipOrder.ManyToOne: return RelationshipOrder.OneToMany;
-//         case RelationshipOrder.ManyToMany: return RelationshipOrder.ManyToMany;
-//     }
-// }
+function getReversedRelationshipOrder(
+  order: RelationshipOrder
+): RelationshipOrder {
+  switch (order) {
+    case RelationshipOrder.OneToOne:
+      return RelationshipOrder.OneToOne;
+    case RelationshipOrder.OneToMany:
+      return RelationshipOrder.ManyToOne;
+    case RelationshipOrder.ManyToOne:
+      return RelationshipOrder.OneToMany;
+    case RelationshipOrder.ManyToMany:
+      return RelationshipOrder.ManyToMany;
+  }
+}

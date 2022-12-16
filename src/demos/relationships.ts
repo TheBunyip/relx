@@ -8,7 +8,7 @@ import { log } from "../core/log";
 import {
   describeDefinition as describeRelationshipDefinition,
   make as makeRelationship,
-  exists as relationshipExists,
+  find as findRelationship,
 } from "../core/relationships";
 import { relationships, tags } from "../modules/physical-world/index";
 import gazetteer from "./gazetteer";
@@ -93,7 +93,7 @@ log("Here are true facts about the current world..");
   const isRelated = (subject: Thing, rel: string, object: Thing) => {
     log(
       `${subject.name} is${
-        relationshipExists(subject, getTag(rel), { noun: object }) ? "" : " NOT"
+        findRelationship(subject, getTag(rel), { noun: object }) ? "" : " NOT"
       } ${rel} ${object.name}`
     );
   };
