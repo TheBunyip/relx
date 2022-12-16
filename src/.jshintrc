@@ -1,6 +1,7 @@
 {
-    "esversion": 11,
-    "eqeqeq": true,
-    "strict": true,
-    "node": true
+  "esversion": 11,
+  "eqeqeq": true,
+  "strict": true,
+  "node": true,
+  "quotmarks": "double"
 }

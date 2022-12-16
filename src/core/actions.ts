@@ -1,6 +1,11 @@
 import { Tag } from "./tags";
 import { Thing } from "./things";
-import { Instructions, rulebooks, appliesTo as ruleAppliesTo } from "./rules";
+import {
+  Instructions,
+  FailableInstructions,
+  rulebooks,
+  appliesTo as ruleAppliesTo,
+} from "./rules";
 import { log } from "./log";
 
 export type Action = {
@@ -12,17 +17,17 @@ export type Action = {
   noun?: Tag;
   secondNoun?: Tag;
 
-  check: Instructions;
+  check: FailableInstructions;
   carryOut: Instructions;
   report: Instructions;
 };
 
-export function defineAction(
+export function define(
   subjectTag: Tag,
   name: string,
   nounTag?: Tag,
   secondNounTag?: Tag,
-  onCheck?: Instructions,
+  onCheck?: FailableInstructions,
   onCarryOut?: Instructions,
   onReport?: Instructions
 ): Action {
@@ -31,9 +36,9 @@ export function defineAction(
     subject: subjectTag,
     noun: nounTag,
     secondNoun: secondNounTag,
-    check: onCheck || defaultCheck.bind(null, name),
-    carryOut: onCarryOut || defaultCarryOut.bind(null, name),
-    report: onReport || defaultReport.bind(null, name),
+    check: onCheck || check.bind(null, name),
+    carryOut: onCarryOut || carryOut.bind(null, name),
+    report: onReport || report.bind(null, name),
   };
 }
 
@@ -42,14 +47,14 @@ export function execute(
   action: Action,
   noun?: Thing,
   secondNoun?: Thing
-): void {
+): boolean {
   // pass basic reasonability checks (e.g. the noun exists)
   // these are usually to handle unusual situations in which this action
   // could be invoked
   for (const rule of rulebooks.before) {
     if (ruleAppliesTo(rule, action, subject, noun, secondNoun)) {
       if (!rule.instructions(subject, noun, secondNoun)) {
-        return;
+        return false;
       }
     }
   }
@@ -59,7 +64,7 @@ export function execute(
   for (const rule of rulebooks.instead) {
     if (ruleAppliesTo(rule, action, subject, noun, secondNoun)) {
       if (!rule.instructions(subject, noun, secondNoun)) {
-        return;
+        return false;
       }
     }
   }
@@ -67,7 +72,7 @@ export function execute(
   // a mundane rule that checks the action is valid
   // e.g. make sure you're not trying to take something you're already carrying
   if (!action.check(subject, noun, secondNoun)) {
-    return;
+    return false;
   }
 
   // a mundane rule that carries out the action in a standard way
@@ -85,9 +90,10 @@ export function execute(
   // a mundane rule that gives a standard report of the action's outcome
   // e.g. "You took the rope"
   action.report(subject, noun, secondNoun);
+  return true;
 }
 
-export function defaultCheck(
+export function check(
   action: string,
   subject: Thing,
   noun?: Thing,
@@ -100,7 +106,7 @@ export function defaultCheck(
   );
   return true;
 }
-export function defaultCarryOut(
+export function carryOut(
   action: string,
   subject: Thing,
   noun?: Thing,
@@ -114,7 +120,7 @@ export function defaultCarryOut(
   return true;
 }
 
-export function defaultReport(
+export function report(
   action: string,
   subject: Thing,
   noun?: Thing,

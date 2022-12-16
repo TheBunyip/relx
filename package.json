@@ -16,6 +16,7 @@
   "dependencies": {
     "@types/pluralize": "^0.0.29",
     "array-to-sentence": "^2.0.0",
+    "colors": "^1.4.0",
     "pluralize": "^8.0.0"
   },
   "devDependencies": {

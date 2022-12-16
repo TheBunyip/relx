@@ -27,8 +27,8 @@ export default {
     tags.visible,
     tags.touchable,
   ]),
-  bob: makeThing("bob", [tags.human, tags.visible, tags.touchable]),
-  sue: makeThing("sue", [tags.human, tags.visible, tags.touchable]),
+  bob: makeThing("bob", [tags.character, tags.visible, tags.touchable]),
+  sue: makeThing("sue", [tags.character, tags.visible, tags.touchable]),
   box: makeThing("box", [
     tags.flammable,
     tags.supporter,
@@ -37,5 +37,5 @@ export default {
     tags.touchable,
   ]),
   sun: makeThing("sun", [tags.visible]),
-  invisbleMan: makeThing("invisible man", [tags.human, tags.touchable]),
+  invisbleMan: makeThing("invisible man", [tags.character, tags.touchable]),
 };
