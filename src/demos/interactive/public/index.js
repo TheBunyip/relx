@@ -6,6 +6,7 @@ async function refreshUI(world) {
   imageElements.innerHTML = "";
   imageElements.className = "";
   buttonElements.innerHTML = "";
+  inventoryElements.innerHTML = "";
 
   world.things.forEach((thing) => {
     // an image in the top panel
@@ -14,7 +15,11 @@ async function refreshUI(world) {
     imageElement.className = "selectable";
     imageElement.src = `/images/${thing.name}.png`;
 
-    imageElements.appendChild(imageElement);
+    if (world.userInventory.includes(thing.name)) {
+      inventoryElements.appendChild(imageElement);
+    } else {
+      imageElements.appendChild(imageElement);
+    }
 
     imageElement.onclick = (event) => onThingSelected(event.target, world);
   });
@@ -50,7 +55,7 @@ async function onThingSelected(imageElement, world) {
     // highlight the selected thing and present action options
     if (world.selectedThing) {
       const lastSelectedImage = document.querySelector(
-        `img#${world.selectedThing.name}`
+        `img[id="${world.selectedThing.name}"]`
       );
       if (lastSelectedImage) {
         lastSelectedImage.classList.remove("selected");
@@ -84,6 +89,7 @@ async function refreshButtons(world) {
     const actions = await response.json();
     actions.forEach((action) => {
       const buttonElement = document.createElement("button");
+      buttonElement.id = action.name;
       buttonElement.innerText = action.name;
       buttonElements.appendChild(buttonElement);
       buttonElement.onclick = (event) =>
@@ -93,6 +99,15 @@ async function refreshButtons(world) {
 }
 
 function onActionSelected(buttonElement, expectsSecondThing, world) {
+  if (world.selectedAction) {
+    const lastSelectedButton = document.querySelector(
+      `button[id="${world.selectedAction}"]`
+    );
+    if (lastSelectedButton) {
+      lastSelectedButton.classList.remove("selected");
+    }
+  }
+
   world.selectedAction = buttonElement.innerHTML;
 
   if (expectsSecondThing) {
@@ -110,12 +125,17 @@ ws.onopen = () => {
 
   ws.onmessage = (event) => {
     const payload = JSON.parse(event.data);
+
     if (payload.world) {
       console.log(payload.world);
       refreshUI(payload.world);
-    } else if (payload.msg) {
+    }
+
+    if (payload.msg) {
       console.log("Server says:" + payload.msg);
-    } else if ("actionResult" in payload) {
+    }
+
+    if ("actionResult" in payload) {
       const className = `${payload.actionResult ? "success" : "failure"}-alert`;
       document.body.classList.add(className);
       setTimeout(() => {
@@ -139,10 +159,3 @@ document.getElementById("add-object").addEventListener("submit", (event) => {
 
   event.preventDefault();
 });
-
-(async function () {
-  const response = await fetch("/world");
-  const world = await response.json();
-  console.log(world);
-  refreshUI(world);
-})();

@@ -17,6 +17,8 @@ const user = makeThing("user", [
   PhysicalWorld.tags.touchable,
 ]);
 
+export { Thing };
+
 export type ObjectData = Thing & { image: string };
 
 export type World = {

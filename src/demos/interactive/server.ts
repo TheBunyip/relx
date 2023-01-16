@@ -31,20 +31,6 @@ World.init(localFilesPath).then((world) => {
       client.send(JSON.stringify({ msg }));
     });
   });
-
-  app.get("/world", (req, res) => {
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
-    const transformedWorld = {
-      things: world.things.map((t) => {
-        return {
-          name: t.name,
-        };
-      }),
-    };
-    res.send(JSON.stringify(transformedWorld));
-  });
-
   app.get("/possible-actions/:thing", (req, res) => {
     const actions = World.getPossibleActions(req.params.thing);
     res.statusCode = 200;
@@ -72,27 +58,44 @@ World.init(localFilesPath).then((world) => {
       action,
       secondThing
     );
-    wss.clients.forEach((client) => {
-      client.send(JSON.stringify({ actionResult: actionSuccessful }));
-    });
+    if (actionSuccessful) {
+      const clientWorld = getClientWorld(world);
+      wss.clients.forEach((client) => {
+        client.send(JSON.stringify({ actionResult: true, world: clientWorld }));
+      });
+    } else {
+      wss.clients.forEach((client) => {
+        client.send(JSON.stringify({ actionResult: false }));
+      });
+    }
     res.statusCode = 200;
     res.end();
+  });
+
+  wss.on("connection", (ws) => {
+    console.log("Client connected");
+    ws.send(JSON.stringify({ world: getClientWorld(world) }));
   });
 
   console.log(`Listening on port ${port}`);
   server.listen(port);
 });
 
-wss.on("connection", (ws) => {
-  console.log("Client connected");
-});
-
-function refreshClients(world: any) {
-  const msg = JSON.stringify({
-    world,
-  });
+function refreshClients(world: World.World) {
+  const msg = JSON.stringify({ world: getClientWorld(world) });
 
   wss.clients.forEach((client) => {
     client.send(msg);
   });
+}
+
+function getClientWorld(world: World.World) {
+  return {
+    things: world.things.map((t: World.Thing) => {
+      return {
+        name: t.name,
+      };
+    }),
+    userInventory: world.userInventory,
+  };
 }
