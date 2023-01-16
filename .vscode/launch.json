@@ -27,6 +27,19 @@
         "${workspaceRoot}/../../node_modules/**/*",
         "<node_internals>/**/*"
       ]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Interactive Server",
+      "program": "${workspaceFolder}/src/demos/interactive/server.ts",
+      "preLaunchTask": "npm: build",
+      "env": {
+        "PUBLIC_PATH": "${workspaceFolder}/src/demos/interactive/public"
+      },
+      "outFiles": ["${workspaceFolder}/build/**/*.js"],
+      "args": ["--verbose"],
+      "sourceMaps": true
     }
   ]
 }

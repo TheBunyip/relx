@@ -3,6 +3,7 @@ import * as Actions from "../../core/actions";
 import { get as getTag } from "../../core/tags";
 import { log } from "../../core/log";
 import inferKinds from "./infer-kinds";
+import { find as findRelationship } from "../../core/relationships";
 import fs from "fs/promises";
 import path from "path";
 import { parse, stringify } from "flatted";
@@ -20,11 +21,14 @@ export type ObjectData = Thing & { image: string };
 
 export type World = {
   things: Array<Thing>;
+  userInventory: Array<string>;
 };
 
 export async function init(localFilesPath: string): Promise<World> {
-  let things = await loadThings(localFilesPath);
+  let { things, userInventory } = await loadThings(localFilesPath);
   if (!things.length) {
+    userInventory = [];
+
     const duck = makeThing("duck", [
       PhysicalWorld.tags.character,
       PhysicalWorld.tags.carryable,
@@ -61,9 +65,9 @@ export async function init(localFilesPath: string): Promise<World> {
       })
     );
 
-    await saveThings(things, localFilesPath);
+    await saveThings(things, [], localFilesPath);
   }
-  return { things };
+  return { things, userInventory };
 }
 
 export async function addThing(
@@ -93,7 +97,7 @@ export async function addThing(
   );
   if (world.things.every((t) => t.name !== thing.name)) {
     world.things.push(thing);
-    saveThings(world.things, localFilesPath);
+    saveThings(world.things, world.userInventory, localFilesPath);
     return true;
   } else {
     return false;
@@ -133,7 +137,22 @@ export function attemptAction(
       throw new Error(`Unknown second thing: ${secondThingName}`);
     }
   }
-  Actions.execute(user, action, firstThing, secondThing);
+  const success = Actions.execute(user, action, firstThing, secondThing);
+
+  // recalculate inventory
+  world.userInventory = world.things
+    .filter((thing) => {
+      return findRelationship(
+        thing,
+        PhysicalWorld.relationships.carriedBy.type,
+        {
+          noun: user,
+        }
+      );
+    })
+    .map((t) => t.name);
+
+  return success;
 }
 
 async function loadThings(localFilesPath: string) {
@@ -150,17 +169,19 @@ async function loadThings(localFilesPath: string) {
       }
     });
   } catch {
-    return [];
+    return { things: [], userInventory: [] };
   }
 }
 
-async function saveThings(things: Thing[], localFilesPath: string) {
+async function saveThings(
+  things: Thing[],
+  userInventory: string[],
+  localFilesPath: string
+) {
   const dbText = stringify(
-    things,
+    { things, userInventory },
     function replacer(key, value) {
-      if (key === "relationships") {
-        return undefined;
-      } else if (value instanceof Set && key === "kinds") {
+      if (value instanceof Set && key === "kinds") {
         const modifiedValue = [...value].map((s) => s.description);
         console.log("Replacing set with", modifiedValue);
         return modifiedValue;

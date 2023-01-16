@@ -66,7 +66,15 @@ World.init(localFilesPath).then((world) => {
   app.post("/attempt-action", (req, res) => {
     const { firstThing, action, secondThing } = req.body;
     console.log(`Client wants ${firstThing} ${action} ${secondThing ?? ""}`);
-    World.attemptAction(world, firstThing, action, secondThing);
+    const actionSuccessful = World.attemptAction(
+      world,
+      firstThing,
+      action,
+      secondThing
+    );
+    wss.clients.forEach((client) => {
+      client.send(JSON.stringify({ actionResult: actionSuccessful }));
+    });
     res.statusCode = 200;
     res.end();
   });

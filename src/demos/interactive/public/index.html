@@ -2,6 +2,10 @@
 <html>
   <head>
     <style>
+      * {
+        font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+          sans-serif;
+      }
       /* Set the width and display property for the panels */
       .panel {
         width: 100%;
@@ -33,6 +37,7 @@
 
       .panel button {
         border-radius: 5px;
+        font-size: 20px;
         height: 40px;
         display: inline-block;
       }
@@ -58,9 +63,33 @@
       .panel2 button:hover {
         background-color: lightpink;
       }
-      /* set the flex direction for the third panel to column*/
-      .panel3 {
-        flex-direction: column;
+      body.success-alert {
+        animation: 0.5s ease-in-out 0s success-alert;
+      }
+      body.failure-alert {
+        animation: 0.5s ease-in-out 0s failure-alert;
+      }
+      @keyframes success-alert {
+        from {
+          background-color: transparent;
+        }
+        50% {
+          background-color: lightgreen;
+        }
+        to {
+          background-color: transparent;
+        }
+      }
+      @keyframes failure-alert {
+        from {
+          background-color: transparent;
+        }
+        50% {
+          background-color: pink;
+        }
+        to {
+          background-color: transparent;
+        }
       }
     </style>
   </head>
@@ -76,6 +105,10 @@
         <input type="text" name="name" placeholder="Search" />
         <button type="submit">Add Object</button>
       </form>
+    </div>
+    <div class="panel panel4">
+      <h2>Inventory...</h2>
+      <div id="inventory-images"></div>
     </div>
 
     <script type="module" src="index.js"></script>

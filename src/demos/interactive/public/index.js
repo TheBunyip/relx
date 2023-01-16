@@ -1,5 +1,6 @@
 const imageElements = document.getElementById("object-images");
 const buttonElements = document.getElementById("object-buttons");
+const inventoryElements = document.getElementById("inventory-images");
 
 async function refreshUI(world) {
   imageElements.innerHTML = "";
@@ -12,6 +13,7 @@ async function refreshUI(world) {
     imageElement.id = thing.name;
     imageElement.className = "selectable";
     imageElement.src = `/images/${thing.name}.png`;
+
     imageElements.appendChild(imageElement);
 
     imageElement.onclick = (event) => onThingSelected(event.target, world);
@@ -113,6 +115,12 @@ ws.onopen = () => {
       refreshUI(payload.world);
     } else if (payload.msg) {
       console.log("Server says:" + payload.msg);
+    } else if ("actionResult" in payload) {
+      const className = `${payload.actionResult ? "success" : "failure"}-alert`;
+      document.body.classList.add(className);
+      setTimeout(() => {
+        document.body.classList.remove(className);
+      }, 500);
     }
   };
 };
