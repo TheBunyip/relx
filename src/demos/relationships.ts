@@ -25,18 +25,8 @@ import gazetteer from "./gazetteer";
     gazetteer.candle,
     error
   );
-  makeRelationship(
-    gazetteer.bob,
-    relationships.carrying,
-    gazetteer.rope,
-    error
-  );
-  makeRelationship(
-    gazetteer.sue,
-    relationships.carrying,
-    gazetteer.rope,
-    error
-  );
+  makeRelationship(gazetteer.bob, relationships.hold, gazetteer.rope, error);
+  makeRelationship(gazetteer.sue, relationships.hold, gazetteer.rope, error);
   makeRelationship(
     gazetteer.box,
     relationships.containing,

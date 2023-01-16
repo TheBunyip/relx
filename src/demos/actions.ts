@@ -33,13 +33,10 @@ insteadOf(bobTakingSomethingWhileHolding, cannotPickUpWhenHolding);
 
 // perform some actions
 (function () {
-  executeAction(gazetteer.bob, actions.holding, gazetteer.rope);
-
   executeAction(gazetteer.bob, actions.taking, gazetteer.rope);
   executeAction(gazetteer.bob, actions.taking, gazetteer.table);
 
-  executeAction(gazetteer.bob, actions.holding, gazetteer.rope);
-  executeAction(gazetteer.bob, actions.holding, gazetteer.rope);
+  executeAction(gazetteer.bob, actions.taking, gazetteer.rope);
 
   executeAction(gazetteer.bob, actions.taking, gazetteer.candle);
 

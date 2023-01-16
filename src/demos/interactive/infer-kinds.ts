@@ -5,14 +5,16 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-export default async function getInferredKinds(objectName: string) {
+export default async function getInferredKinds(
+  objectName: string
+): Promise<string[]> {
   try {
     const completion = await openai.createCompletion({
       model: "text-curie-001",
       prompt: generatePrompt(objectName),
       temperature: 0.3,
     });
-    return completion.data.choices[0].text?.split(",");
+    return completion.data.choices[0].text?.split(",") || [];
   } catch (error: any) {
     // Consider adjusting the error handling logic for your use case
     if (error.response) {

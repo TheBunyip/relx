@@ -18,6 +18,23 @@ async function refreshUI(world) {
   });
 }
 
+async function attemptAction(world, secondThing) {
+  fetch("/attempt-action/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      firstThing: world.selectedThing.name,
+      action: world.selectedAction,
+      secondThing,
+    }),
+  });
+  delete world.selectedAction;
+  delete world.selectedThing;
+  refreshUI(world);
+}
+
 async function onThingSelected(imageElement, world) {
   // are we selecting the first or second 'noun' here?
   const secondarySelection = imageElements.classList.contains(
@@ -26,20 +43,7 @@ async function onThingSelected(imageElement, world) {
 
   if (secondarySelection) {
     // fire off an action on the server
-    fetch("/attempt-action/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        firstNoun: world.selectedThing.name,
-        secondNoun: imageElement.id,
-        action: world.selectedAction,
-      }),
-    });
-    delete world.selectedAction;
-    delete world.selectedThing;
-    refreshUI(world);
+    attemptAction(world, imageElement.id);
   } else {
     // highlight the selected thing and present action options
     if (world.selectedThing) {
@@ -73,22 +77,28 @@ async function refreshButtons(world) {
 
   if (world.selectedThing) {
     const response = await fetch(
-      `/valid-actions-for-thing/${world.selectedThing.name}`
+      `/possible-actions/${world.selectedThing.name}`
     );
     const actions = await response.json();
     actions.forEach((action) => {
       const buttonElement = document.createElement("button");
-      buttonElement.innerText = action;
+      buttonElement.innerText = action.name;
       buttonElements.appendChild(buttonElement);
-      buttonElement.onclick = (event) => onActionSelected(event.target, world);
+      buttonElement.onclick = (event) =>
+        onActionSelected(event.target, action.expectsSecondThing, world);
     });
   }
 }
 
-function onActionSelected(buttonElement, world) {
-  buttonElement.classList.add("selected");
-  imageElements.classList.add("secondary-selection");
+function onActionSelected(buttonElement, expectsSecondThing, world) {
   world.selectedAction = buttonElement.innerHTML;
+
+  if (expectsSecondThing) {
+    buttonElement.classList.add("selected");
+    imageElements.classList.add("secondary-selection");
+  } else {
+    attemptAction(world);
+  }
 }
 
 const ws = new WebSocket(`ws://${location.host}`);
@@ -99,7 +109,10 @@ ws.onopen = () => {
   ws.onmessage = (event) => {
     const payload = JSON.parse(event.data);
     if (payload.world) {
+      console.log(payload.world);
       refreshUI(payload.world);
+    } else if (payload.msg) {
+      console.log("Server says:" + payload.msg);
     }
   };
 };

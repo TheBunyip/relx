@@ -1,5 +1,5 @@
 import { Tag } from "./tags";
-import { Thing } from "./things";
+import { Thing, test as testThing } from "./things";
 import {
   Instructions,
   FailableInstructions,
@@ -36,7 +36,7 @@ export function define(
     subject: subjectTag,
     noun: nounTag,
     secondNoun: secondNounTag,
-    check: onCheck || check.bind(null, name),
+    check: onCheck || (() => true),
     carryOut: onCarryOut || carryOut.bind(null, name),
     report: onReport || report.bind(null, name),
   };
@@ -49,8 +49,6 @@ export function execute(
   secondNoun?: Thing
 ): boolean {
   // pass basic reasonability checks (e.g. the noun exists)
-  // these are usually to handle unusual situations in which this action
-  // could be invoked
   for (const rule of rulebooks.before) {
     if (ruleAppliesTo(rule, action, subject, noun, secondNoun)) {
       if (!rule.instructions(subject, noun, secondNoun)) {
@@ -71,7 +69,7 @@ export function execute(
 
   // a mundane rule that checks the action is valid
   // e.g. make sure you're not trying to take something you're already carrying
-  if (!action.check(subject, noun, secondNoun)) {
+  if (!check(action, subject, noun, secondNoun)) {
     return false;
   }
 
@@ -93,18 +91,47 @@ export function execute(
   return true;
 }
 
-export function check(
-  action: string,
+function check(
+  action: Action,
   subject: Thing,
   noun?: Thing,
   secondNoun?: Thing
 ): boolean {
   log(
-    `CHECKING: action ${action} (subject: ${subject.name}, noun: ${
+    `Checking action '${action.name}' (subject: ${subject.name}, noun: ${
       noun ? noun.name : "none"
-    }, secondNoun: ${secondNoun ? secondNoun.name : "none"})`
+    }, secondNoun: ${secondNoun ? secondNoun.name : "none"}) can take place.`
   );
-  return true;
+
+  // perform basic checks on the kinds of subject, noun and secondNoun
+  if (!testThing(subject, action.subject)) {
+    log(
+      `The action '${action.name}' cannot be performed by '${subject.name}'.`
+    );
+    return false;
+  }
+  if (action.noun && (!noun || !testThing(noun, action.noun))) {
+    log(
+      `The action '${action.name}' cannot be performed on '${
+        noun ? noun.name : "nothing"
+      }'.`
+    );
+    return false;
+  }
+  if (
+    action.secondNoun &&
+    (!secondNoun || !testThing(secondNoun, action.secondNoun))
+  ) {
+    log(
+      `The action '${action.name}' cannot be performed on '${
+        secondNoun ? secondNoun.name : "nothing"
+      }'.`
+    );
+    return false;
+  }
+
+  // perform any custom checks defined for this action
+  return action.check(subject, noun, secondNoun);
 }
 export function carryOut(
   action: string,
@@ -113,9 +140,10 @@ export function carryOut(
   secondNoun?: Thing
 ): boolean {
   log(
-    `CARRYING OUT: action ${action} (subject: ${subject.name}, noun: ${
+    `Action '${action}' (with subject: ${subject.name}, noun: ${
       noun ? noun.name : "none"
-    }, secondNoun: ${secondNoun ? secondNoun.name : "none"})`
+    }, secondNoun: ${secondNoun ? secondNoun.name : "none"})
+    has no logic when carried out (is this really intentional?).`
   );
   return true;
 }
@@ -127,9 +155,11 @@ export function report(
   secondNoun?: Thing
 ): boolean {
   log(
-    `REPORTING: action ${action} (subject: ${subject.name}, noun: ${
-      noun ? noun.name : "none"
-    }, secondNoun: ${secondNoun ? secondNoun.name : "none"})`
+    `Successfully carried out action '${action}' (with subject: ${
+      subject.name
+    }, noun: ${noun ? noun.name : "none"}, secondNoun: ${
+      secondNoun ? secondNoun.name : "none"
+    }).`
   );
   return true;
 }
