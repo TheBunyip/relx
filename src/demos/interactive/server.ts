@@ -21,6 +21,8 @@ app.use(express.json());
 const localFilesPath =
   process.env.PUBLIC_PATH ?? path.join(__dirname, "./public");
 
+console.log("Serving from", localFilesPath);
+
 World.init(localFilesPath).then((world) => {
   console.log("Serving from", localFilesPath);
   app.use(express.static(localFilesPath));
@@ -48,6 +50,8 @@ World.init(localFilesPath).then((world) => {
     res.statusCode = 200;
     res.end();
   });
+
+  app.get("image");
 
   app.post("/attempt-action", (req, res) => {
     const { firstThing, action, secondThing } = req.body;

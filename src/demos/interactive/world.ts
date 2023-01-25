@@ -17,6 +17,8 @@ const user = makeThing("user", [
   PhysicalWorld.tags.touchable,
 ]);
 
+const dbPath = path.join(__dirname, "db.json");
+
 export { Thing };
 
 export type ObjectData = Thing & { image: string };
@@ -27,7 +29,7 @@ export type World = {
 };
 
 export async function init(localFilesPath: string): Promise<World> {
-  let { things, userInventory } = await loadThings(localFilesPath);
+  let { things, userInventory } = await loadThings();
   if (!things.length) {
     userInventory = [];
 
@@ -67,7 +69,7 @@ export async function init(localFilesPath: string): Promise<World> {
       })
     );
 
-    await saveThings(things, [], localFilesPath);
+    await saveThings(things, []);
   }
   return { things, userInventory };
 }
@@ -99,7 +101,8 @@ export async function addThing(
   );
   if (world.things.every((t) => t.name !== thing.name)) {
     world.things.push(thing);
-    saveThings(world.things, world.userInventory, localFilesPath);
+    saveThings(world.things, world.userInventory);
+
     return true;
   } else {
     return false;
@@ -157,9 +160,9 @@ export function attemptAction(
   return success;
 }
 
-async function loadThings(localFilesPath: string) {
+async function loadThings() {
   try {
-    const dbText = await fs.readFile(path.join(localFilesPath, "db.json"), {
+    const dbText = await fs.readFile(dbPath, {
       encoding: "utf8",
     });
 
@@ -175,17 +178,13 @@ async function loadThings(localFilesPath: string) {
   }
 }
 
-async function saveThings(
-  things: Thing[],
-  userInventory: string[],
-  localFilesPath: string
-) {
+async function saveThings(things: Thing[], userInventory: string[]) {
   const dbText = stringify(
     { things, userInventory },
     function replacer(key, value) {
       if (value instanceof Set && key === "kinds") {
         const modifiedValue = [...value].map((s) => s.description);
-        console.log("Replacing set with", modifiedValue);
+        //console.log("Replacing set with", modifiedValue);
         return modifiedValue;
       } else {
         return value;
@@ -194,9 +193,7 @@ async function saveThings(
     // 2
   );
   try {
-    await fs.writeFile(path.join(localFilesPath, "db.json"), dbText, {
-      encoding: "utf8",
-    });
+    await fs.writeFile(dbPath, dbText, { encoding: "utf8" });
   } catch (err) {
     console.error("Failed to save world DB to disk", err);
   }

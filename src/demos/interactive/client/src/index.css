@@ -1,0 +1,117 @@
+html,
+body {
+  width: 100%;
+  background-color: #eaeaea;
+}
+
+* {
+  font-family: "Courier New", Courier, monospace;
+}
+/* for debugging */
+/* * {
+  
+  user-select: none;
+  outline: 1px solid red;
+} */
+
+.panel {
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 2px 2px 10px #666;
+  margin: 20px;
+  padding: 20px;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+.dynamic-panel-elements {
+  display: flex;
+  /* flex-direction: column; */
+}
+
+.dynamic-panel-elements > * {
+  margin-right: 16px;
+}
+
+.add-object-form {
+  padding: 10px 0px;
+}
+.panel h2 {
+  margin-top: 0;
+}
+/* Set the width and display property for the images */
+.panel img {
+  width: 100px;
+  height: 100px;
+  display: inline-block;
+  background-color: transparent;
+  padding: 6px;
+}
+.panel img.selected {
+  background-color: lightblue;
+  opacity: 0.5;
+}
+.panel img:hover {
+  cursor: pointer;
+}
+.panel img.selectable:hover {
+  background-color: lightgreen;
+}
+.panel .secondary-selection img.selectable:hover {
+  background-color: lightpink;
+}
+
+.panel input[type="text"] {
+  border-radius: 5px;
+  height: 32px;
+  width: 280px;
+  font-size: 16px;
+  display: inline-block;
+}
+
+/* set the flex wrap to wrap  */
+button {
+  border-radius: 5px;
+  font-size: 20px;
+  height: 40px;
+  display: inline-block;
+  flex-wrap: wrap;
+  min-width: 60px;
+  margin-right: 10px;
+  background-color: lightblue;
+}
+button.selected,
+button:hover {
+  background-color: lightpink;
+}
+
+.success-alert {
+  animation: 0.5s ease-in-out 0s success-alert;
+}
+.failure-alert {
+  animation: 0.5s ease-in-out 0s failure-alert;
+}
+@keyframes success-alert {
+  from {
+    background-color: transparent;
+  }
+  50% {
+    background-color: lightgreen;
+  }
+  to {
+    background-color: transparent;
+  }
+}
+@keyframes failure-alert {
+  from {
+    background-color: transparent;
+  }
+  50% {
+    background-color: pink;
+  }
+  to {
+    background-color: transparent;
+  }
+}
