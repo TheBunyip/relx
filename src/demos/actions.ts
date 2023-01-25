@@ -45,15 +45,15 @@ insteadOf(bobTakingSomethingWhileHolding, cannotPickUpWhenHolding);
   executeAction(gazetteer.bob, actions.taking, gazetteer.candle);
 })();
 
-function gruntingHappens(subject: Thing, noun?: Thing, secondNoun?: Thing) {
+function gruntingHappens(subject: Thing, object?: Thing, secondObject?: Thing) {
   log(`${subject.name} grunts...`);
   return true;
 }
 
 function tableTooHeavy(
   subject: Thing,
-  noun?: Thing,
-  secondNoun?: Thing
+  object?: Thing,
+  secondObject?: Thing
 ): boolean {
   log(`The table is too heavy for ${subject.name} to carry`);
   return false;
@@ -61,11 +61,13 @@ function tableTooHeavy(
 
 function cannotPickUpWhenHolding(
   subject: Thing,
-  noun?: Thing,
-  secondNoun?: Thing
+  object?: Thing,
+  secondObject?: Thing
 ): boolean {
-  if (noun) {
-    log(`${subject.name} cannot pick up ${noun.name} while holding something`);
+  if (object) {
+    log(
+      `${subject.name} cannot pick up ${object.name} while holding something`
+    );
   }
   return false;
 }

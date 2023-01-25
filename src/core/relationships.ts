@@ -129,7 +129,7 @@ export function find(
       (!object ||
         objectAllows(
           {
-            noun: r.otherThing,
+            object: r.otherThing,
             tags: r.otherThing.kinds,
           },
           object

@@ -4,7 +4,7 @@ import * as Actions from "../../src/core/actions";
 import { get as getTag } from "../../src/core/tags";
 
 describe("appliesTo", () => {
-  test("first noun must be a matching kind", () => {
+  test("first object must be a matching kind", () => {
     const subjectKind = getTag("subject-type");
     const subject = Things.make("test-subject", [subjectKind]);
     const action = Actions.define(

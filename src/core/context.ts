@@ -7,8 +7,8 @@ import { Something, Tag } from "./tags";
 import { Thing } from "./things";
 
 export class ObjectContext {
-  noun?: Thing;
-  secondNoun?: Thing;
+  object?: Thing;
+  secondObject?: Thing;
   tags?: Set<Tag>;
 }
 
@@ -27,23 +27,18 @@ export function objectAllows(
   objectA: ObjectContext,
   objectB: ObjectContext
 ): boolean {
-  if (objectA.noun && objectB.noun && objectB.noun !== objectA.noun)
+  if (objectA.object && objectB.object && objectB.object !== objectA.object)
     return false;
   if (
-    objectA.secondNoun &&
-    objectB.secondNoun &&
-    objectB.secondNoun !== objectA.secondNoun
-  )
+    objectA.secondObject &&
+    objectB.secondObject &&
+    objectB.secondObject !== objectA.secondObject
+  ) {
     return false;
-  // if (objectA.tags && objectB.noun) {
-  //     if (!objectA.tags.has(Something) &&
-  //         !tagsOverlap(objectA.tags, objectB.noun.kinds)) {
-  //         return false;
-  //     }
-  // }
-  const objectATags = objectA.tags || objectA.noun?.kinds;
+  }
+  const objectATags = objectA.tags || objectA.object?.kinds;
   if (objectATags) {
-    const objectBTags = objectB.tags || objectB.noun?.kinds;
+    const objectBTags = objectB.tags || objectB.object?.kinds;
     if (
       !objectATags.has(Something) &&
       objectBTags &&

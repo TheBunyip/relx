@@ -29,12 +29,26 @@ World.init(localFilesPath).then((world) => {
 
   Log.setLog((str: string, prefix?: string) => {
     const msg = `${prefix ?? ""} ${str}`;
-    wss.clients.forEach((client) => {
-      client.send(JSON.stringify({ msg }));
-    });
+    // wss.clients.forEach((client) => {
+    //   client.send(JSON.stringify({ msg }));
+    // });
+    console.log(msg);
   });
-  app.get("/possible-actions/:thing", (req, res) => {
-    const actions = World.getPossibleActions(req.params.thing);
+
+  app.get("/viable-actions/:thing", (req, res) => {
+    const actions = World.getViableActionsFor(world, req.params.thing);
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "application/json");
+    console.log(`Sending actions '${JSON.stringify(actions)}' to client`);
+    res.send(JSON.stringify(actions));
+  });
+
+  app.get("/viable-second-things/:thing/:action", (req, res) => {
+    const actions = World.getViableSecondThingsFor(
+      world,
+      req.params.thing,
+      req.params.action
+    );
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
     res.send(JSON.stringify(actions));

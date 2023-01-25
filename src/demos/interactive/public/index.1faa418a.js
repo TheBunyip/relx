@@ -27164,7 +27164,8 @@ function App() {
         thing: undefined,
         action: undefined,
         secondThing: undefined,
-        viableActions: []
+        viableActions: [],
+        viableSecondThings: []
     });
     ws.onopen = ()=>{
         console.log("Websocket connected");
@@ -27188,7 +27189,7 @@ function App() {
                 setSelection: setSelection
             }, void 0, false, {
                 fileName: "src/app.js",
-                lineNumber: 48,
+                lineNumber: 49,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _actionsDefault.default), {
@@ -27197,7 +27198,7 @@ function App() {
                 setSelection: setSelection
             }, void 0, false, {
                 fileName: "src/app.js",
-                lineNumber: 49,
+                lineNumber: 50,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _inventoryDefault.default), {
@@ -27206,7 +27207,7 @@ function App() {
                 setSelection: setSelection
             }, void 0, false, {
                 fileName: "src/app.js",
-                lineNumber: 54,
+                lineNumber: 55,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _alertDefault.default), {
@@ -27214,21 +27215,21 @@ function App() {
                 setAlert: setAlertMsg
             }, void 0, false, {
                 fileName: "src/app.js",
-                lineNumber: 59,
+                lineNumber: 60,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "src/app.js",
-        lineNumber: 47,
+        lineNumber: 48,
         columnNumber: 5
     }, this);
 }
 exports.default = App;
-_s(App, "Pts+aLdBKwhyVfD4DjlomzmxDek=");
+_s(App, "/gdnDMVkKPA4R63JMebJ652tZAY=");
 _c = App;
 async function onThingSelected(name, world, selection, setSelection) {
-    // are we selecting the first or second 'noun' here?
+    // are we selecting the first or second object here?
     if (selection.action) // fire off an action on the server
     attemptAction(selection.thing, selection.action.name, name, setSelection);
     else {
@@ -27238,25 +27239,31 @@ async function onThingSelected(name, world, selection, setSelection) {
                 ...prevSelection,
                 thing: selectedThing?.name
             }));
-        updateButtons(selectedThing?.name, setSelection);
+        // check which actions are now viable
+        const response = await fetch(`/viable-actions/${name}`);
+        const actions = await response.json();
+        console.log("Viable actions", JSON.stringify(actions));
+        setSelection((prevSelection)=>({
+                ...prevSelection,
+                viableActions: actions
+            }));
     }
 }
 async function onActionSelected(action, world, selection, setSelection) {
-    if (action.expectsSecondThing) setSelection((prevSelection)=>({
-            ...prevSelection,
-            action: action
-        }));
-    else attemptAction(selection.thing, action.name, undefined, setSelection);
-}
-async function updateButtons(thing, setSelection) {
-    // check which buttons to show
-    const response = await fetch(`/possible-actions/${thing}`);
-    const actions = await response.json();
-    console.log("Viable actions", JSON.stringify(actions));
-    setSelection((prevSelection)=>({
-            ...prevSelection,
-            viableActions: actions
-        }));
+    if (action.expectsSecondThing) {
+        setSelection((prevSelection)=>({
+                ...prevSelection,
+                action: action
+            }));
+        // check which secondary objects are now viable
+        const response = await fetch(`/viable-second-things/${selection.thing}/${action.name}`);
+        const secondThings = await response.json();
+        console.log("Viable second things", JSON.stringify(secondThings));
+        setSelection((prevSelection)=>({
+                ...prevSelection,
+                viableSecondThings: secondThings
+            }));
+    } else attemptAction(selection.thing, action.name, undefined, setSelection);
 }
 async function attemptAction(thing, action, secondThing, setSelection) {
     console.log("Attempting action...");
@@ -27274,7 +27281,8 @@ async function attemptAction(thing, action, secondThing, setSelection) {
     setSelection({
         thing: undefined,
         action: undefined,
-        viableActions: []
+        viableActions: [],
+        viableSecondThings: []
     });
 }
 var _c;
@@ -27553,13 +27561,14 @@ parcelHelpers.defineInteropFlag(exports);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 exports.default = function({ names , selection , handleClick  }) {
     const imageElements = names.map((name, index)=>{
+        const selectable = !selection.action || selection.viableSecondThings.some((thingName)=>name === thingName);
         return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
             src: `/images/${name}.png`,
-            className: `selectable ${selection.thing === name ? "selected" : ""}`,
+            className: `${selectable ? "selectable" : ""} ${selection.thing === name ? "selected" : ""}`,
             onClick: ()=>handleClick(name)
         }, name, false, {
             fileName: "src/components/clickable-images.js",
-            lineNumber: 4,
+            lineNumber: 8,
             columnNumber: 7
         }, this);
     });
@@ -27569,7 +27578,7 @@ exports.default = function({ names , selection , handleClick  }) {
         children: imageElements
     }, void 0, false, {
         fileName: "src/components/clickable-images.js",
-        lineNumber: 14,
+        lineNumber: 20,
         columnNumber: 5
     }, this);
 };
@@ -27698,6 +27707,7 @@ var _jsxDevRuntime = require("react/jsx-dev-runtime");
 function titleise(text) {
     // capitalise the first letter of the text
     if (text.length) text = text.charAt(0).toUpperCase() + text.slice(1);
+    return text;
 }
 exports.default = function({ alert , setAlert  }) {
     if (alert.type) setTimeout(()=>{
@@ -27706,19 +27716,19 @@ exports.default = function({ alert , setAlert  }) {
                 type: undefined
             }));
     }, 500);
-    const alertElement = alert.text ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
+    const alertElement = alert.text && alert.text !== "" ? /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("p", {
         children: titleise(alert.text)
     }, void 0, false, {
         fileName: "src/components/alert.js",
-        lineNumber: 15,
-        columnNumber: 37
+        lineNumber: 17,
+        columnNumber: 39
     }, this) : null;
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
         className: `panel ${alert.type ? alert.type + "-alert" : ""} ${alertElement ? "" : "hidden"}`,
         children: alertElement
     }, void 0, false, {
         fileName: "src/components/alert.js",
-        lineNumber: 18,
+        lineNumber: 20,
         columnNumber: 5
     }, this);
 };

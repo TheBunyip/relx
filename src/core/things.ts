@@ -4,7 +4,6 @@ import {
   RelationshipDefinition,
   find as findRelationship,
 } from "./relationships";
-import { objectAllows } from "./context";
 import { Something, Tag } from "./tags";
 
 export type Thing = {
@@ -14,6 +13,8 @@ export type Thing = {
   kinds: Set<Tag>;
   relationships: Array<Relationship>;
 };
+
+export const Anything = make("Anything", [Something]);
 
 export function make(name: string, kinds: Tag[]): Thing {
   return {
@@ -43,31 +44,12 @@ export function addRelationship(
   return relationship;
 }
 
-// function findRelationship(subject: Thing, type: Tag, object?: Thing): number {
-//   return subject.relationships.findIndex((r) => {
-//     return (
-//       r.type === type &&
-//       (!object ||
-//         objectAllows(
-//           {
-//             noun: r.otherThing,
-//             tags: r.otherThing.kinds,
-//           },
-//           {
-//             noun: object,
-//             tags: object.kinds,
-//           }
-//         ))
-//     );
-//   });
-// }
-
 export function removeRelationship(
   subject: Thing,
   def: RelationshipDefinition,
   object?: Thing
 ): void {
-  const relationship = findRelationship(subject, def.type, { noun: object });
+  const relationship = findRelationship(subject, def.type, { object: object });
   if (relationship) {
     subject.relationships = subject.relationships.filter(
       (r) => r !== relationship
@@ -76,14 +58,6 @@ export function removeRelationship(
     reversedSubject.relationships = reversedSubject.relationships.filter(
       (r) => r.type !== def.reversed!.type || r.otherThing !== subject
     );
-    // const reversedRelationshipIndex = findRelationship(
-    //   object,
-    //   def.reversed!.type,
-    //   subject
-    // );
-    // if (reversedRelationshipIndex !== -1) {
-    //   object.relationships.splice(reversedRelationshipIndex, 1);
-    // }
   }
 }
 

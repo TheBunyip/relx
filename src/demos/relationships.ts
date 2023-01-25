@@ -83,7 +83,7 @@ log("Here are true facts about the current world..");
   const isRelated = (subject: Thing, rel: string, object: Thing) => {
     log(
       `${subject.name} is${
-        findRelationship(subject, getTag(rel), { noun: object }) ? "" : " NOT"
+        findRelationship(subject, getTag(rel), { object: object }) ? "" : " NOT"
       } ${rel} ${object.name}`
     );
   };

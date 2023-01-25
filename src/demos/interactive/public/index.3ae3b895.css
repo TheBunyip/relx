@@ -28,7 +28,7 @@ html, body {
 }
 
 .add-object-form {
-  padding: 10px 0;
+  padding: 30px 0 10px;
 }
 
 .panel h2 {
@@ -38,13 +38,14 @@ html, body {
 .panel img {
   width: 100px;
   height: 100px;
+  opacity: .2;
   background-color: #0000;
   padding: 6px;
   display: inline-block;
 }
 
 .panel img.selected {
-  opacity: .5;
+  opacity: 1;
   background-color: #add8e6;
 }
 
@@ -52,7 +53,12 @@ html, body {
   cursor: pointer;
 }
 
+.panel img.selectable {
+  opacity: 1;
+}
+
 .panel img.selectable:hover {
+  opacity: 1;
   background-color: #90ee90;
 }
 
@@ -61,9 +67,10 @@ html, body {
 }
 
 .panel input[type="text"] {
-  height: 32px;
+  height: 34px;
   width: 280px;
   border-radius: 5px;
+  margin: 0 20px 0 0;
   font-size: 16px;
   display: inline-block;
 }

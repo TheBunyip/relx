@@ -4,14 +4,14 @@ import { Circumstance } from "./circumstances";
 
 export type Instructions = (
   subject: Thing,
-  noun?: Thing,
-  secondNoun?: Thing
+  object?: Thing,
+  secondObject?: Thing
 ) => void;
 
 export type FailableInstructions = (
   subject: Thing,
-  noun?: Thing,
-  secondNoun?: Thing
+  object?: Thing,
+  secondObject?: Thing
 ) => boolean;
 
 type Rule = {
@@ -48,8 +48,12 @@ export function appliesTo(
   rule: Rule,
   action: Action,
   subject: Thing,
-  noun?: Thing,
-  secondNoun?: Thing
+  object?: Thing,
+  secondObject?: Thing
 ): boolean {
-  return rule.circumstance({ action, subject, object: { noun, secondNoun } });
+  return rule.circumstance({
+    action,
+    subject,
+    object: { object: object, secondObject: secondObject },
+  });
 }

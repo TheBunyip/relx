@@ -8,7 +8,7 @@ import {
   allowed as relationshipAllowed,
   RelationshipOrder,
 } from "../../core/relationships";
-import { define as defineAction } from "../../core/actions";
+import { Action, define as defineAction } from "../../core/actions";
 
 // tags relating to the physical world
 export const tags = {
@@ -103,63 +103,79 @@ export const actions = {
   ),
 };
 
-function checkTakeAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
-  if (!noun) {
+function checkTakeAction(subject: Thing, object?: Thing, secondObject?: Thing) {
+  if (!object) {
     log(`${subject.name} cannot take nothing`);
     return false;
   }
 
-  if (!noun.kinds.has(tags.carryable)) {
-    log(`${noun.name} is not carryable`);
+  if (!object.kinds.has(tags.carryable)) {
+    log(`${object.name} is not carryable`);
     return false;
   }
 
-  return relationshipAllowed(subject, relationships.carrying, noun, log);
+  return relationshipAllowed(subject, relationships.carrying, object, log);
 }
 
-function carryOutTakeAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
-  if (noun) {
-    removeRelationship(noun, relationships.supportedBy);
-    makeRelationship(subject, relationships.carrying, noun, log);
+function carryOutTakeAction(
+  subject: Thing,
+  object?: Thing,
+  secondObject?: Thing
+) {
+  if (object) {
+    removeRelationship(object, relationships.supportedBy);
+    makeRelationship(subject, relationships.carrying, object, log);
   }
 }
 
 function checkDropAction(
   subject: Thing,
-  noun?: Thing,
-  secondNoun?: Thing
+  object?: Thing,
+  secondObject?: Thing
 ): boolean {
-  if (!noun) {
+  if (!object) {
     log(`${subject.name} cannot drop nothing`);
     return false;
   }
-  if (!findRelationship(subject, relationships.carrying.type, { noun })) {
-    log(`${subject.name} cannot drop ${noun.name} without carrying it first`);
+  if (
+    !findRelationship(subject, relationships.carrying.type, { object: object })
+  ) {
+    log(`${subject.name} cannot drop ${object.name} without carrying it first`);
     return false;
   }
   return true;
 }
 
-function carryOutDropAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
-  if (noun) {
-    removeRelationship(subject, relationships.carrying, noun);
+function carryOutDropAction(
+  subject: Thing,
+  object?: Thing,
+  secondObject?: Thing
+) {
+  if (object) {
+    removeRelationship(subject, relationships.carrying, object);
   }
 }
 
-function checkPutOntoAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
-  if (!noun) {
+function checkPutOntoAction(
+  subject: Thing,
+  object?: Thing,
+  secondObject?: Thing
+) {
+  if (!object) {
     log(`${subject.name} cannot put nothing onto anything`);
     return false;
   }
 
-  if (!secondNoun) {
-    log(`${subject.name} cannot put ${noun.name} onto nothing`);
+  if (!secondObject) {
+    log(`${subject.name} cannot put ${object.name} onto nothing`);
     return false;
   }
 
-  if (!findRelationship(subject, relationships.carrying.type, { noun })) {
+  if (
+    !findRelationship(subject, relationships.carrying.type, { object: object })
+  ) {
     log(
-      `${subject.name} cannot put ${noun.name} onto ${secondNoun.name} without carrying it first`
+      `${subject.name} cannot put ${object.name} onto ${secondObject.name} without carrying it first`
     );
     return false;
   }
@@ -169,29 +185,35 @@ function checkPutOntoAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
 
 function carryOutPutOntoAction(
   subject: Thing,
-  noun?: Thing,
-  secondNoun?: Thing
+  object?: Thing,
+  secondObject?: Thing
 ) {
-  if (noun && secondNoun) {
-    removeRelationship(subject, relationships.carrying, noun);
-    makeRelationship(secondNoun, relationships.supporting, noun);
+  if (object && secondObject) {
+    removeRelationship(subject, relationships.carrying, object);
+    makeRelationship(secondObject, relationships.supporting, object);
   }
 }
 
-function checkPutIntoAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
-  if (!noun) {
+function checkPutIntoAction(
+  subject: Thing,
+  object?: Thing,
+  secondObject?: Thing
+) {
+  if (!object) {
     log(`${subject.name} cannot put nothing into anything`);
     return false;
   }
 
-  if (!secondNoun) {
-    log(`${subject.name} cannot put ${noun.name} into nothing`);
+  if (!secondObject) {
+    log(`${subject.name} cannot put ${object.name} into nothing`);
     return false;
   }
 
-  if (!findRelationship(subject, relationships.carrying.type, { noun })) {
+  if (
+    !findRelationship(subject, relationships.carrying.type, { object: object })
+  ) {
     log(
-      `${subject.name} cannot put ${noun.name} into ${secondNoun.name} without carrying it first`
+      `${subject.name} cannot put ${object.name} into ${secondObject.name} without carrying it first`
     );
     return false;
   }
@@ -201,11 +223,11 @@ function checkPutIntoAction(subject: Thing, noun?: Thing, secondNoun?: Thing) {
 
 function carryOutPutIntoAction(
   subject: Thing,
-  noun?: Thing,
-  secondNoun?: Thing
+  object?: Thing,
+  secondObject?: Thing
 ) {
-  if (noun && secondNoun) {
-    removeRelationship(subject, relationships.carrying, noun);
-    makeRelationship(secondNoun, relationships.containing, noun);
+  if (object && secondObject) {
+    removeRelationship(subject, relationships.carrying, object);
+    makeRelationship(secondObject, relationships.containing, object);
   }
 }

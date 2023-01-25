@@ -12,8 +12,8 @@ export type CircumstanceBuilder = {
   currentContext: Context;
   is: (action: Action) => CircumstanceBuilder;
   already: (relationship: RelationshipDefinition) => CircumstanceBuilder;
-  the: (noun: Thing) => CircumstanceBuilder;
-  andThe: (noun: Thing) => CircumstanceBuilder;
+  the: (object: Thing) => CircumstanceBuilder;
+  andThe: (object: Thing) => CircumstanceBuilder;
   a: (tag: Tag) => CircumstanceBuilder;
   and: (circumstance: Circumstance) => CircumstanceBuilder;
   build: () => Circumstance;
@@ -42,16 +42,15 @@ function makeCircumstanceBuilder(): CircumstanceBuilder {
     already: (relationship: RelationshipDefinition): CircumstanceBuilder => {
       const ctx = builder.currentContext;
       assert(ctx.subject);
-      //assert(ctx.object && ctx.object.noun);
       ctx.relationship = relationship;
       return builder;
     },
-    the: (noun: Thing): CircumstanceBuilder => {
+    the: (object: Thing): CircumstanceBuilder => {
       const ctx = builder.currentContext;
       assert(ctx.subject);
       assert(ctx.action || ctx.relationship);
       ctx.object = ctx.object || new ObjectContext();
-      ctx.object.noun = noun;
+      ctx.object.object = object;
       return builder;
     },
     a: (tag: Tag): CircumstanceBuilder => {
@@ -63,13 +62,13 @@ function makeCircumstanceBuilder(): CircumstanceBuilder {
       builder.currentContext.object?.tags?.add(tag);
       return builder;
     },
-    andThe: (noun: Thing): CircumstanceBuilder => {
+    andThe: (secondObject: Thing): CircumstanceBuilder => {
       const ctx = builder.currentContext;
       assert(ctx.subject);
-      assert(ctx.object && ctx.object.noun);
+      assert(ctx.object && ctx.object.object);
       assert(ctx.action || ctx.relationship);
       ctx.object = ctx.object || new ObjectContext();
-      ctx.object.secondNoun = noun;
+      ctx.object.secondObject = secondObject;
       return builder;
     },
     and: (circumstance: Circumstance): CircumstanceBuilder => {

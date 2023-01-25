@@ -1,6 +1,6 @@
 import { make as makeThing, Thing } from "../../core/things";
 import * as Actions from "../../core/actions";
-import { get as getTag } from "../../core/tags";
+import { get as getTag, Something } from "../../core/tags";
 import { log } from "../../core/log";
 import inferKinds from "./infer-kinds";
 import { find as findRelationship } from "../../core/relationships";
@@ -109,14 +109,51 @@ export async function addThing(
   }
 }
 
-export function getPossibleActions(name: string) {
+export function getViableActionsFor(world: World, thingName: string) {
+  const firstThing = world.things.find((thing) => thing.name === thingName);
+  if (!firstThing) {
+    log(`Unrecognised object ${thingName}`);
+    return [];
+  }
+
   // all the actions we want to allow the user to try
-  return Object.values(PhysicalWorld.actions).map((action) => {
-    return {
+  return Object.values(PhysicalWorld.actions)
+    .filter((action) => {
+      const viable = Actions.checkTheoretical(action, user, firstThing);
+      return viable;
+    })
+    .map((action) => ({
       name: action.name,
-      expectsSecondThing: !!action.secondNoun,
-    };
-  });
+      expectsSecondThing: !!action.secondObjectTag,
+    }));
+}
+
+export function getViableSecondThingsFor(
+  world: World,
+  thingName: string,
+  actionName: string
+) {
+  const action = Object.values(PhysicalWorld.actions).find(
+    (action) => action.name === actionName
+  );
+  if (!action) {
+    log(`Unrecognised action ${actionName}`);
+    return [];
+  }
+
+  const firstThing = world.things.find((thing) => thing.name === thingName);
+  if (!firstThing) {
+    log(`Unrecognised object ${thingName} for action ${actionName}`);
+    return [];
+  }
+
+  return world.things
+    .filter((secondThing) => {
+      // check if this could be a viable second thing
+      const viable = Actions.check(action, user, firstThing, secondThing);
+      return viable;
+    })
+    .map((thing) => thing.name);
 }
 
 export function attemptAction(
@@ -126,7 +163,7 @@ export function attemptAction(
   secondThingName?: string
 ) {
   const action = Object.values(PhysicalWorld.actions).find(
-    (a) => a.name === actionName
+    (action) => action.name === actionName
   );
   if (!action) {
     throw new Error(`Unknown action: ${actionName}`);
@@ -136,7 +173,7 @@ export function attemptAction(
     throw new Error(`Unknown first thing: ${firstThingName}`);
   }
   let secondThing;
-  if (action.secondNoun) {
+  if (action.secondObjectTag) {
     secondThing = world.things.find((t) => t.name === secondThingName);
     if (!secondThing) {
       throw new Error(`Unknown second thing: ${secondThingName}`);
@@ -151,7 +188,7 @@ export function attemptAction(
         thing,
         PhysicalWorld.relationships.carriedBy.type,
         {
-          noun: user,
+          object: user,
         }
       );
     })
@@ -190,7 +227,6 @@ async function saveThings(things: Thing[], userInventory: string[]) {
         return value;
       }
     }
-    // 2
   );
   try {
     await fs.writeFile(dbPath, dbText, { encoding: "utf8" });

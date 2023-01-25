@@ -3,6 +3,7 @@ function titleise(text) {
   if (text.length) {
     text = text.charAt(0).toUpperCase() + text.slice(1);
   }
+  return text;
 }
 
 export default function ({ alert, setAlert }) {
@@ -12,7 +13,8 @@ export default function ({ alert, setAlert }) {
     }, 500);
   }
 
-  const alertElement = alert.text ? <p>{titleise(alert.text)}</p> : null;
+  const alertElement =
+    alert.text && alert.text !== "" ? <p>{titleise(alert.text)}</p> : null;
 
   return (
     <div

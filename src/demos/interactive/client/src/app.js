@@ -23,6 +23,7 @@ export default function App() {
     action: undefined,
     secondThing: undefined,
     viableActions: [],
+    viableSecondThings: [],
   });
 
   ws.onopen = () => {
@@ -62,7 +63,7 @@ export default function App() {
 }
 
 export async function onThingSelected(name, world, selection, setSelection) {
-  // are we selecting the first or second 'noun' here?
+  // are we selecting the first or second object here?
   if (selection.action) {
     // fire off an action on the server
     attemptAction(selection.thing, selection.action.name, name, setSelection);
@@ -74,28 +75,34 @@ export async function onThingSelected(name, world, selection, setSelection) {
       thing: selectedThing?.name,
     }));
 
-    updateButtons(selectedThing?.name, setSelection);
+    // check which actions are now viable
+    const response = await fetch(`/viable-actions/${name}`);
+    const actions = await response.json();
+    console.log("Viable actions", JSON.stringify(actions));
+    setSelection((prevSelection) => ({
+      ...prevSelection,
+      viableActions: actions,
+    }));
   }
 }
 
 export async function onActionSelected(action, world, selection, setSelection) {
   if (action.expectsSecondThing) {
     setSelection((prevSelection) => ({ ...prevSelection, action: action }));
+
+    // check which secondary objects are now viable
+    const response = await fetch(
+      `/viable-second-things/${selection.thing}/${action.name}`
+    );
+    const secondThings = await response.json();
+    console.log("Viable second things", JSON.stringify(secondThings));
+    setSelection((prevSelection) => ({
+      ...prevSelection,
+      viableSecondThings: secondThings,
+    }));
   } else {
     attemptAction(selection.thing, action.name, undefined, setSelection);
   }
-}
-
-async function updateButtons(thing, setSelection) {
-  // check which buttons to show
-
-  const response = await fetch(`/possible-actions/${thing}`);
-  const actions = await response.json();
-  console.log("Viable actions", JSON.stringify(actions));
-  setSelection((prevSelection) => ({
-    ...prevSelection,
-    viableActions: actions,
-  }));
 }
 
 async function attemptAction(thing, action, secondThing, setSelection) {
@@ -116,5 +123,6 @@ async function attemptAction(thing, action, secondThing, setSelection) {
     thing: undefined,
     action: undefined,
     viableActions: [],
+    viableSecondThings: [],
   });
 }

@@ -1,7 +1,8 @@
 {
   "jshint.exclude": {},
   "search.exclude": {
-    "package-lock.json": true
+    "package-lock.json": true,
+    "**/demos/interactive/public/": true
   },
   "debug.javascript.autoAttachFilter": "onlyWithFlag"
 }
