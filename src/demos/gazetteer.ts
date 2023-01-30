@@ -1,41 +1,52 @@
 import { make as makeThing } from "../core/things";
 
-import { tags } from "../modules/physical-world/index";
+import { get as getTag } from "../core/tags";
 
 // make some concrete things
 export default {
   rope: makeThing("rope", [
-    tags.long,
-    tags.strong,
-    tags.thin,
-    tags.flammable,
-    tags.carryable,
-    tags.visible,
-    tags.touchable,
+    getTag("long"),
+    getTag("strong"),
+    getTag("thin"),
+    getTag("flammable"),
+    getTag("carryable"),
+    getTag("visible"),
+    getTag("touchable"),
   ]),
   candle: makeThing("candle", [
-    tags.thin,
-    tags.flammable,
-    tags.lightable,
-    tags.carryable,
-    tags.visible,
-    tags.touchable,
+    getTag("thin"),
+    getTag("flammable"),
+    getTag("lightable"),
+    getTag("carryable"),
+    getTag("visible"),
+    getTag("touchable"),
   ]),
   table: makeThing("table", [
-    tags.strong,
-    tags.supporter,
-    tags.visible,
-    tags.touchable,
+    getTag("strong"),
+    getTag("supporter"),
+    getTag("visible"),
+    getTag("touchable"),
   ]),
-  bob: makeThing("bob", [tags.character, tags.visible, tags.touchable]),
-  sue: makeThing("sue", [tags.character, tags.visible, tags.touchable]),
+  bob: makeThing("bob", [
+    getTag("character"),
+    getTag("visible"),
+    getTag("touchable"),
+  ]),
+  sue: makeThing("sue", [
+    getTag("character"),
+    getTag("visible"),
+    getTag("touchable"),
+  ]),
   box: makeThing("box", [
-    tags.flammable,
-    tags.supporter,
-    tags.container,
-    tags.visible,
-    tags.touchable,
+    getTag("flammable"),
+    getTag("supporter"),
+    getTag("container"),
+    getTag("visible"),
+    getTag("touchable"),
   ]),
-  sun: makeThing("sun", [tags.visible]),
-  invisbleMan: makeThing("invisible man", [tags.character, tags.touchable]),
+  sun: makeThing("sun", [getTag("visible")]),
+  invisbleMan: makeThing("invisible man", [
+    getTag("character"),
+    getTag("touchable"),
+  ]),
 };

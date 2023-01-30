@@ -27137,6 +27137,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "onThingSelected", ()=>onThingSelected);
 parcelHelpers.export(exports, "onActionSelected", ()=>onActionSelected);
+parcelHelpers.export(exports, "onExtensionSelected", ()=>onExtensionSelected);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
 var _react = require("react");
 var _reactDefault = parcelHelpers.interopDefault(_react);
@@ -27146,6 +27147,8 @@ var _actions = require("./components/actions");
 var _actionsDefault = parcelHelpers.interopDefault(_actions);
 var _inventory = require("./components/inventory");
 var _inventoryDefault = parcelHelpers.interopDefault(_inventory);
+var _extensions = require("./components/extensions");
+var _extensionsDefault = parcelHelpers.interopDefault(_extensions);
 var _alert = require("./components/alert");
 var _alertDefault = parcelHelpers.interopDefault(_alert);
 var _s = $RefreshSig$();
@@ -27154,7 +27157,8 @@ function App() {
     _s();
     const [world, setWorld] = (0, _reactDefault.default).useState({
         things: [],
-        userInventory: []
+        userInventory: [],
+        extensions: []
     });
     const [alertMsg, setAlertMsg] = (0, _reactDefault.default).useState({
         text: undefined,
@@ -27189,7 +27193,7 @@ function App() {
                 setSelection: setSelection
             }, void 0, false, {
                 fileName: "src/app.js",
-                lineNumber: 49,
+                lineNumber: 51,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _actionsDefault.default), {
@@ -27198,7 +27202,7 @@ function App() {
                 setSelection: setSelection
             }, void 0, false, {
                 fileName: "src/app.js",
-                lineNumber: 50,
+                lineNumber: 52,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _inventoryDefault.default), {
@@ -27207,7 +27211,15 @@ function App() {
                 setSelection: setSelection
             }, void 0, false, {
                 fileName: "src/app.js",
-                lineNumber: 55,
+                lineNumber: 57,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _extensionsDefault.default), {
+                world: world,
+                setWorld: setWorld
+            }, void 0, false, {
+                fileName: "src/app.js",
+                lineNumber: 62,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _alertDefault.default), {
@@ -27215,18 +27227,18 @@ function App() {
                 setAlert: setAlertMsg
             }, void 0, false, {
                 fileName: "src/app.js",
-                lineNumber: 60,
+                lineNumber: 63,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "src/app.js",
-        lineNumber: 48,
+        lineNumber: 50,
         columnNumber: 5
     }, this);
 }
 exports.default = App;
-_s(App, "/gdnDMVkKPA4R63JMebJ652tZAY=");
+_s(App, "0L3RCnWOPLm90tSH9G4vXZpFR90=");
 _c = App;
 async function onThingSelected(name, world, selection, setSelection) {
     // are we selecting the first or second object here?
@@ -27265,6 +27277,7 @@ async function onActionSelected(action, world, selection, setSelection) {
             }));
     } else attemptAction(selection.thing, action.name, undefined, setSelection);
 }
+async function onExtensionSelected(world) {}
 async function attemptAction(thing, action, secondThing, setSelection) {
     console.log("Attempting action...");
     fetch("/attempt-action/", {
@@ -27293,7 +27306,7 @@ $RefreshReg$(_c, "App");
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","./components/world":"4ifTy","./components/actions":"fB4fz","./components/inventory":"dN4Ui","./components/alert":"2JhXQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"4ifTy":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","react":"21dqq","./components/world":"4ifTy","./components/actions":"fB4fz","./components/inventory":"dN4Ui","./components/extensions":"xruRM","./components/alert":"2JhXQ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"4ifTy":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$1d2b = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -27303,8 +27316,8 @@ try {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
-var _clickableImages = require("./clickable-images");
-var _clickableImagesDefault = parcelHelpers.interopDefault(_clickableImages);
+var _clickableThings = require("./clickable-things");
+var _clickableThingsDefault = parcelHelpers.interopDefault(_clickableThings);
 var _app = require("../app");
 exports.default = function({ world , selection , setSelection  }) {
     console.log("Rendering the world");
@@ -27336,7 +27349,7 @@ exports.default = function({ world , selection , setSelection  }) {
                 lineNumber: 33,
                 columnNumber: 7
             }, this),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _clickableImagesDefault.default), {
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _clickableThingsDefault.default), {
                 names: things,
                 selection: selection,
                 handleClick: handleClick
@@ -27386,7 +27399,46 @@ exports.default = function({ world , selection , setSelection  }) {
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./clickable-images":"3jL3O","../app":"bNKaB"}],"gkKU3":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","./clickable-things":"jyDqL","../app":"bNKaB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"jyDqL":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$53aa = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$53aa.prelude(module);
+
+try {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+exports.default = function({ names , selection , handleClick  }) {
+    const imageElements = names.map((name, index)=>{
+        const selectable = !selection.action || selection.viableSecondThings.some((thingName)=>name === thingName);
+        return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
+            src: `/images/${name}.png`,
+            className: `${selectable ? "selectable" : ""} ${selection.thing === name ? "selected" : ""}`,
+            onClick: ()=>handleClick(name)
+        }, name, false, {
+            fileName: "src/components/clickable-things.js",
+            lineNumber: 8,
+            columnNumber: 7
+        }, this);
+    });
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+        id: "object-images",
+        className: "dynamic-panel-elements",
+        children: imageElements
+    }, void 0, false, {
+        fileName: "src/components/clickable-things.js",
+        lineNumber: 20,
+        columnNumber: 5
+    }, this);
+};
+
+  $parcel$ReactRefreshHelpers$53aa.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"gkKU3":[function(require,module,exports) {
 exports.interopDefault = function(a) {
     return a && a.__esModule ? a : {
         default: a
@@ -27549,46 +27601,7 @@ function registerExportsForReactRefresh(module1) {
     }
 }
 
-},{"c678893fe945e5b6":"786KC"}],"3jL3O":[function(require,module,exports) {
-var $parcel$ReactRefreshHelpers$e20d = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
-var prevRefreshReg = window.$RefreshReg$;
-var prevRefreshSig = window.$RefreshSig$;
-$parcel$ReactRefreshHelpers$e20d.prelude(module);
-
-try {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-var _jsxDevRuntime = require("react/jsx-dev-runtime");
-exports.default = function({ names , selection , handleClick  }) {
-    const imageElements = names.map((name, index)=>{
-        const selectable = !selection.action || selection.viableSecondThings.some((thingName)=>name === thingName);
-        return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
-            src: `/images/${name}.png`,
-            className: `${selectable ? "selectable" : ""} ${selection.thing === name ? "selected" : ""}`,
-            onClick: ()=>handleClick(name)
-        }, name, false, {
-            fileName: "src/components/clickable-images.js",
-            lineNumber: 8,
-            columnNumber: 7
-        }, this);
-    });
-    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        id: "object-images",
-        className: "dynamic-panel-elements",
-        children: imageElements
-    }, void 0, false, {
-        fileName: "src/components/clickable-images.js",
-        lineNumber: 20,
-        columnNumber: 5
-    }, this);
-};
-
-  $parcel$ReactRefreshHelpers$e20d.postlude(module);
-} finally {
-  window.$RefreshReg$ = prevRefreshReg;
-  window.$RefreshSig$ = prevRefreshSig;
-}
-},{"react/jsx-dev-runtime":"iTorj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"fB4fz":[function(require,module,exports) {
+},{"c678893fe945e5b6":"786KC"}],"fB4fz":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$556a = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -27643,7 +27656,7 @@ exports.default = function({ world , selection , setSelection  }) {
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","../app":"bNKaB"}],"dN4Ui":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","../app":"bNKaB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"dN4Ui":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$fb67 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -27653,8 +27666,8 @@ try {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _jsxDevRuntime = require("react/jsx-dev-runtime");
-var _clickableImages = require("./clickable-images");
-var _clickableImagesDefault = parcelHelpers.interopDefault(_clickableImages);
+var _clickableThings = require("./clickable-things");
+var _clickableThingsDefault = parcelHelpers.interopDefault(_clickableThings);
 var _app = require("../app");
 exports.default = function({ world , selection , setSelection  }) {
     console.log("Rendering the inventory");
@@ -27672,7 +27685,7 @@ exports.default = function({ world , selection , setSelection  }) {
                 lineNumber: 18,
                 columnNumber: 7
             }, this),
-            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _clickableImagesDefault.default), {
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _clickableThingsDefault.default), {
                 names: things,
                 selection: selection,
                 handleClick: handleClick
@@ -27694,7 +27707,102 @@ exports.default = function({ world , selection , setSelection  }) {
   window.$RefreshReg$ = prevRefreshReg;
   window.$RefreshSig$ = prevRefreshSig;
 }
-},{"react/jsx-dev-runtime":"iTorj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru","./clickable-images":"3jL3O","../app":"bNKaB"}],"2JhXQ":[function(require,module,exports) {
+},{"react/jsx-dev-runtime":"iTorj","./clickable-things":"jyDqL","../app":"bNKaB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"xruRM":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$aaf9 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$aaf9.prelude(module);
+
+try {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+var _toggleableImages = require("./toggleable-images");
+var _toggleableImagesDefault = parcelHelpers.interopDefault(_toggleableImages);
+var _app = require("../app");
+exports.default = function({ world , setWorld  }) {
+    console.log("Rendering the extensions");
+    const handleClick = (name)=>(0, _app.onExtensionSelected)(name, world, setWorld);
+    const extensionsWithPath = world.extensions.map((extension)=>{
+        return {
+            ...extension,
+            path: "modules"
+        };
+    });
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+        className: "panel",
+        children: [
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("h2", {
+                children: "Extensions"
+            }, void 0, false, {
+                fileName: "src/components/extensions.js",
+                lineNumber: 15,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)((0, _toggleableImagesDefault.default), {
+                data: extensionsWithPath,
+                handleClick: handleClick
+            }, void 0, false, {
+                fileName: "src/components/extensions.js",
+                lineNumber: 16,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "src/components/extensions.js",
+        lineNumber: 14,
+        columnNumber: 5
+    }, this);
+};
+
+  $parcel$ReactRefreshHelpers$aaf9.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","./toggleable-images":"3ugAG","../app":"bNKaB","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"3ugAG":[function(require,module,exports) {
+var $parcel$ReactRefreshHelpers$f42e = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
+var prevRefreshReg = window.$RefreshReg$;
+var prevRefreshSig = window.$RefreshSig$;
+$parcel$ReactRefreshHelpers$f42e.prelude(module);
+
+try {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+var _jsxDevRuntime = require("react/jsx-dev-runtime");
+exports.default = function({ data , handleClick  }) {
+    const imageElements = data.map((datum)=>{
+        const styles = {
+            opacity: datum.enabled ? 1 : 0.3
+        };
+        return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("img", {
+            src: `/images/${datum.path}/${datum.name}.png`,
+            title: datum.description,
+            style: styles,
+            onClick: ()=>handleClick(datum.name)
+        }, datum.name, false, {
+            fileName: "src/components/toggleable-images.js",
+            lineNumber: 6,
+            columnNumber: 7
+        }, this);
+    });
+    return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
+        id: "object-images",
+        className: "dynamic-panel-elements",
+        children: imageElements
+    }, void 0, false, {
+        fileName: "src/components/toggleable-images.js",
+        lineNumber: 17,
+        columnNumber: 5
+    }, this);
+};
+
+  $parcel$ReactRefreshHelpers$f42e.postlude(module);
+} finally {
+  window.$RefreshReg$ = prevRefreshReg;
+  window.$RefreshSig$ = prevRefreshSig;
+}
+},{"react/jsx-dev-runtime":"iTorj","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js":"km3Ru"}],"2JhXQ":[function(require,module,exports) {
 var $parcel$ReactRefreshHelpers$3913 = require("@parcel/transformer-react-refresh-wrap/lib/helpers/helpers.js");
 var prevRefreshReg = window.$RefreshReg$;
 var prevRefreshSig = window.$RefreshSig$;
@@ -27723,12 +27831,16 @@ exports.default = function({ alert , setAlert  }) {
         lineNumber: 17,
         columnNumber: 39
     }, this) : null;
+    const styles = {
+        visibility: alertElement ? "visible" : "hidden"
+    };
     return /*#__PURE__*/ (0, _jsxDevRuntime.jsxDEV)("div", {
-        className: `panel ${alert.type ? alert.type + "-alert" : ""} ${alertElement ? "" : "hidden"}`,
+        className: `panel ${alert.type ? alert.type + "-alert" : ""}`,
+        style: styles,
         children: alertElement
     }, void 0, false, {
         fileName: "src/components/alert.js",
-        lineNumber: 20,
+        lineNumber: 24,
         columnNumber: 5
     }, this);
 };

@@ -14,7 +14,7 @@ export type FailableInstructions = (
   secondObject?: Thing
 ) => boolean;
 
-type Rule = {
+export type Rule = {
   circumstance: Circumstance;
   instructions: Instructions;
 };

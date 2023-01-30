@@ -2,7 +2,7 @@ import { Thing, removeRelationship } from "../core/things";
 import { log } from "../core/log";
 import { execute as executeAction } from "../core/actions";
 import { insteadOf, before } from "../core/rules";
-import { relationships, actions } from "../modules/physical-world/index";
+import { relationshipsByName, actionsByName } from "../core/index";
 import * as Circumstances from "../core/circumstances";
 import { Something } from "../core/tags";
 import gazetteer from "./gazetteer";
@@ -10,7 +10,7 @@ import gazetteer from "./gazetteer";
 // define some unusual situations
 //const bobTakingTable = Circumstances.inAction(gazetteer.bob, taking, gazetteer.table).build();
 const bobTakingTable = Circumstances.when(gazetteer.bob)
-  .is(actions.taking)
+  .is(actionsByName.get("taking")!)
   .the(gazetteer.table)
   .build();
 before(bobTakingTable, gruntingHappens);
@@ -20,11 +20,11 @@ insteadOf(bobTakingTable, tableTooHeavy);
 //     .withState({ subject: gazetteer.bob, action: holding, tag: Something })
 //     .build();
 const bobTakingSomethingWhileHolding = Circumstances.when(gazetteer.bob)
-  .is(actions.taking)
+  .is(actionsByName.get("taking")!)
   .a(Something)
   .and(
     Circumstances.when(gazetteer.bob)
-      .already(relationships.holding)
+      .already(relationshipsByName.get("holding")!)
       .a(Something)
       .build()
   )
@@ -33,16 +33,20 @@ insteadOf(bobTakingSomethingWhileHolding, cannotPickUpWhenHolding);
 
 // perform some actions
 (function () {
-  executeAction(gazetteer.bob, actions.taking, gazetteer.rope);
-  executeAction(gazetteer.bob, actions.taking, gazetteer.table);
+  executeAction(gazetteer.bob, actionsByName.get("taking")!, gazetteer.rope);
+  executeAction(gazetteer.bob, actionsByName.get("taking")!, gazetteer.table);
 
-  executeAction(gazetteer.bob, actions.taking, gazetteer.rope);
+  executeAction(gazetteer.bob, actionsByName.get("taking")!, gazetteer.rope);
 
-  executeAction(gazetteer.bob, actions.taking, gazetteer.candle);
+  executeAction(gazetteer.bob, actionsByName.get("taking")!, gazetteer.candle);
 
-  executeAction(gazetteer.bob, actions.dropping, gazetteer.candle);
-  executeAction(gazetteer.bob, actions.dropping, gazetteer.rope);
-  executeAction(gazetteer.bob, actions.taking, gazetteer.candle);
+  executeAction(
+    gazetteer.bob,
+    actionsByName.get("dropping")!,
+    gazetteer.candle
+  );
+  executeAction(gazetteer.bob, actionsByName.get("dropping")!, gazetteer.rope);
+  executeAction(gazetteer.bob, actionsByName.get("taking")!, gazetteer.candle);
 })();
 
 function gruntingHappens(subject: Thing, object?: Thing, secondObject?: Thing) {

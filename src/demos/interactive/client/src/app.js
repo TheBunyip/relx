@@ -3,6 +3,7 @@ import React from "react";
 import World from "./components/world";
 import Actions from "./components/actions";
 import Inventory from "./components/inventory";
+import Extensions from "./components/extensions";
 import Alert from "./components/alert";
 
 const ws = new WebSocket(`ws://${location.host}`);
@@ -11,6 +12,7 @@ export default function App() {
   const [world, setWorld] = React.useState({
     things: [],
     userInventory: [],
+    extensions: [],
   });
 
   const [alertMsg, setAlertMsg] = React.useState({
@@ -57,6 +59,7 @@ export default function App() {
         selection={selection}
         setSelection={setSelection}
       />
+      <Extensions world={world} setWorld={setWorld} />
       <Alert alert={alertMsg} setAlert={setAlertMsg} />
     </div>
   );
@@ -104,6 +107,8 @@ export async function onActionSelected(action, world, selection, setSelection) {
     attemptAction(selection.thing, action.name, undefined, setSelection);
   }
 }
+
+export async function onExtensionSelected(world) {}
 
 async function attemptAction(thing, action, secondThing, setSelection) {
   console.log("Attempting action...");

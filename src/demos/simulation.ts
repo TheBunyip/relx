@@ -13,30 +13,29 @@ import "colors";
 
 import { execute as executeAction } from "../core/actions";
 import { make as makeThing } from "../core/things";
+import { get as getTag } from "../core/tags";
 import { pickOneFrom } from "../core/utils";
-import * as PhysicalWorld from "../modules/physical-world/index";
+import { actionsByName } from "../core/index";
 
 // THINGS IN THE WORLD
 // characters
 const characters = [
-  makeThing("Avriel", [PhysicalWorld.tags.character]),
-  makeThing("Sundu Mor", [PhysicalWorld.tags.character]),
-  makeThing("Kaylee Bruckton", [PhysicalWorld.tags.character]),
-  makeThing("The Cavalier", [PhysicalWorld.tags.character]),
+  makeThing("Avriel", [getTag("character")]),
+  makeThing("Sundu Mor", [getTag("character")]),
+  makeThing("Kaylee Bruckton", [getTag("character")]),
+  makeThing("The Cavalier", [getTag("character")]),
   ...Array.from(Array(10), (e: Element, i: number) => {
-    return makeThing(`Clockwork Soldier ${i + 1}`, [
-      PhysicalWorld.tags.character,
-    ]);
+    return makeThing(`Clockwork Soldier ${i + 1}`, [getTag("character")]);
   }),
 ];
 // objects
 const objects = [
   makeThing("sandstone block", [
-    PhysicalWorld.tags.carryable,
-    PhysicalWorld.tags.supporter,
-    PhysicalWorld.tags.touchable,
-    PhysicalWorld.tags.visible,
-    PhysicalWorld.tags.touchable,
+    getTag("carryable"),
+    getTag("supporter"),
+    getTag("touchable"),
+    getTag("visible"),
+    getTag("touchable"),
   ]),
 ];
 
@@ -48,7 +47,7 @@ let paused = false;
 function stepSimulation() {
   // for each object that can act, choose an action and perform it
   const subject = pickOneFrom(characters);
-  const attemptedAction = pickOneFrom(Object.values(PhysicalWorld.actions));
+  const attemptedAction = pickOneFrom(Array.from(actionsByName.values()));
   const otherObject = pickOneFrom([null, ...objects]);
   console.log("#", subject.name, "takes action...");
   if (executeAction(subject, attemptedAction, otherObject)) {

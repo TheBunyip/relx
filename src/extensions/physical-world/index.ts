@@ -8,10 +8,10 @@ import {
   allowed as relationshipAllowed,
   RelationshipOrder,
 } from "../../core/relationships";
-import { Action, define as defineAction } from "../../core/actions";
+import { define as defineAction } from "../../core/actions";
 
 // tags relating to the physical world
-export const tags = {
+const tags = {
   long: getTag("long"),
   strong: getTag("strong"),
   thin: getTag("thin"),
@@ -26,7 +26,7 @@ export const tags = {
 };
 
 // define some relationship types
-export const relationships = {
+const relationships = {
   ...defineRelationship(
     tags.character,
     "carrying",
@@ -64,7 +64,7 @@ export const relationships = {
   ),
 };
 
-export const actions = {
+const actions = {
   // define some basic actions
   taking: defineAction(
     tags.character,
@@ -231,3 +231,12 @@ function carryOutPutIntoAction(
     makeRelationship(secondObject, relationships.containing, object);
   }
 }
+
+const extension = {
+  name: "PhysicalWorld",
+  description: "Defines physical interactions between objects",
+  tags: Object.values(tags),
+  actions: Object.values(actions),
+  relationships: Object.values(relationships),
+};
+export default extension;

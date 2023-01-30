@@ -1,4 +1,4 @@
-import ClickableImages from "./clickable-images";
+import ClickableThings from "./clickable-things";
 import { onThingSelected } from "../app";
 
 export default function ({ world, selection, setSelection }) {
@@ -31,7 +31,7 @@ export default function ({ world, selection, setSelection }) {
   return (
     <div className="panel">
       <h2>WORLD</h2>
-      <ClickableImages
+      <ClickableThings
         names={things}
         selection={selection}
         handleClick={handleClick}

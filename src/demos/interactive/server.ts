@@ -14,8 +14,6 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-/** Decode JSON data */
-
 app.use(express.json());
 
 const localFilesPath =
@@ -23,7 +21,7 @@ const localFilesPath =
 
 console.log("Serving from", localFilesPath);
 
-World.init(localFilesPath).then((world) => {
+World.load().then((world) => {
   console.log("Serving from", localFilesPath);
   app.use(express.static(localFilesPath));
 
@@ -115,5 +113,10 @@ function getClientWorld(world: World.World) {
       };
     }),
     userInventory: world.userInventory,
+    extensions: world.extensions.map(({ extension, enabled }) => ({
+      name: extension.name,
+      description: extension.description,
+      enabled,
+    })),
   };
 }

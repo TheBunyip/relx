@@ -15,6 +15,7 @@ export enum RelationshipOrder {
 
 // Read this as 'type' relates 'Things with subjectTag' to 'Things with objectTag'
 export type RelationshipDefinition = {
+  name: string;
   type: RelationshipType;
   subjectTag: Tag;
   objectTag: Tag;
@@ -37,20 +38,22 @@ export function define(
 ) {
   // actually defines a pair
   const relationship: RelationshipDefinition = {
+    name,
     type: getTag(name),
     subjectTag,
     objectTag,
     order,
   };
-  const reversed: RelationshipDefinition = {
+  const reversedRelationship: RelationshipDefinition = {
+    name: reversedName,
     type: getTag(reversedName),
     subjectTag: objectTag,
     objectTag: subjectTag,
     order: getReversedRelationshipOrder(order),
   };
-  relationship.reversed = reversed;
-  reversed.reversed = relationship;
-  return { [name]: relationship, [reversedName]: reversed };
+  relationship.reversed = reversedRelationship;
+  reversedRelationship.reversed = relationship;
+  return { [name]: relationship, [reversedName]: reversedRelationship };
 }
 
 export function make(

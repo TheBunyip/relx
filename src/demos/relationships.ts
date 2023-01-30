@@ -10,7 +10,7 @@ import {
   make as makeRelationship,
   find as findRelationship,
 } from "../core/relationships";
-import { relationships, tags } from "../modules/physical-world/index";
+import { relationshipsByName } from "../core/index";
 import gazetteer from "./gazetteer";
 
 // create some concrete relationships
@@ -21,27 +21,37 @@ import gazetteer from "./gazetteer";
   // these could be made and unmade over time
   makeRelationship(
     gazetteer.table,
-    relationships.supporting,
+    relationshipsByName.get("supporting")!,
     gazetteer.candle,
     error
   );
-  makeRelationship(gazetteer.bob, relationships.hold, gazetteer.rope, error);
-  makeRelationship(gazetteer.sue, relationships.hold, gazetteer.rope, error);
+  makeRelationship(
+    gazetteer.bob,
+    relationshipsByName.get("holding")!,
+    gazetteer.rope,
+    error
+  );
+  makeRelationship(
+    gazetteer.sue,
+    relationshipsByName.get("holding")!,
+    gazetteer.rope,
+    error
+  );
   makeRelationship(
     gazetteer.box,
-    relationships.containing,
+    relationshipsByName.get("containing")!,
     gazetteer.bob,
     error
   );
   makeRelationship(
     gazetteer.bob,
-    relationships.containing,
+    relationshipsByName.get("containing")!,
     gazetteer.box,
     error
   );
   makeRelationship(
     gazetteer.bob,
-    relationships.viewing,
+    relationshipsByName.get("viewing")!,
     gazetteer.sue,
 
     error
@@ -61,7 +71,7 @@ console.log("");
 console.log("########################################################");
 log("Here are some relationships between types of thing..");
 
-Object.values(relationships).forEach((relationship) => {
+relationshipsByName.forEach((relationship) => {
   log(describeRelationshipDefinition(relationship));
 });
 console.log("########################################################");
@@ -88,8 +98,8 @@ log("Here are true facts about the current world..");
     );
   };
 
-  isTagged(gazetteer.rope, tags.touchable);
-  isTagged(gazetteer.bob, tags.flammable);
+  isTagged(gazetteer.rope, getTag("touchable")!);
+  isTagged(gazetteer.bob, getTag("flammable"));
 
   isRelated(gazetteer.bob, "carrying", gazetteer.sun);
   isRelated(gazetteer.bob, "carrying", gazetteer.rope);

@@ -1,5 +1,10 @@
 import { make as makeThing, Thing } from "../../core/things";
 import * as Actions from "../../core/actions";
+import {
+  actionsByName,
+  relationshipsByName,
+  extensions,
+} from "../../core/index";
 import { get as getTag, Something } from "../../core/tags";
 import { log } from "../../core/log";
 import inferKinds from "./infer-kinds";
@@ -7,14 +12,18 @@ import { find as findRelationship } from "../../core/relationships";
 import fs from "fs/promises";
 import path from "path";
 import { parse, stringify } from "flatted";
-
-import * as PhysicalWorld from "../../modules/physical-world/index";
 import getImage from "./get-image";
 
+import {
+  Extension,
+  register as registerExtension,
+} from "../../core/extensions";
+import PhysicalWorldModule from "../../extensions/physical-world";
+
 const user = makeThing("user", [
-  PhysicalWorld.tags.character,
-  PhysicalWorld.tags.visible,
-  PhysicalWorld.tags.touchable,
+  getTag("character"),
+  getTag("visible"),
+  getTag("touchable"),
 ]);
 
 const dbPath = path.join(__dirname, "db.json");
@@ -26,53 +35,8 @@ export type ObjectData = Thing & { image: string };
 export type World = {
   things: Array<Thing>;
   userInventory: Array<string>;
+  extensions: { extension: Extension; enabled: boolean }[];
 };
-
-export async function init(localFilesPath: string): Promise<World> {
-  let { things, userInventory } = await loadThings();
-  if (!things.length) {
-    userInventory = [];
-
-    const duck = makeThing("duck", [
-      PhysicalWorld.tags.character,
-      PhysicalWorld.tags.carryable,
-      PhysicalWorld.tags.touchable,
-      PhysicalWorld.tags.visible,
-    ]);
-
-    const goblin = makeThing("goblin", [
-      PhysicalWorld.tags.character,
-      PhysicalWorld.tags.carryable,
-      PhysicalWorld.tags.touchable,
-      PhysicalWorld.tags.visible,
-    ]);
-
-    const table = makeThing("table", [
-      PhysicalWorld.tags.supporter,
-      PhysicalWorld.tags.flammable,
-      PhysicalWorld.tags.touchable,
-      PhysicalWorld.tags.visible,
-    ]);
-
-    const box = makeThing("box", [
-      PhysicalWorld.tags.supporter,
-      PhysicalWorld.tags.container,
-      PhysicalWorld.tags.flammable,
-      PhysicalWorld.tags.touchable,
-      PhysicalWorld.tags.visible,
-    ]);
-
-    things = await Promise.all(
-      [duck, goblin, table, box].map(async (object) => {
-        await getImage(object.name, localFilesPath);
-        return object;
-      })
-    );
-
-    await saveThings(things, []);
-  }
-  return { things, userInventory };
-}
 
 export async function addThing(
   world: World,
@@ -101,7 +65,7 @@ export async function addThing(
   );
   if (world.things.every((t) => t.name !== thing.name)) {
     world.things.push(thing);
-    saveThings(world.things, world.userInventory);
+    save(world);
 
     return true;
   } else {
@@ -117,15 +81,17 @@ export function getViableActionsFor(world: World, thingName: string) {
   }
 
   // all the actions we want to allow the user to try
-  return Object.values(PhysicalWorld.actions)
-    .filter((action) => {
-      const viable = Actions.checkTheoretical(action, user, firstThing);
-      return viable;
-    })
-    .map((action) => ({
-      name: action.name,
-      expectsSecondThing: !!action.secondObjectTag,
-    }));
+  const viableActions: Actions.Action[] = [];
+  actionsByName.forEach((action, actionName) => {
+    if (Actions.checkTheoretical(action, user, firstThing)) {
+      viableActions.push(action);
+    }
+  });
+
+  return viableActions.map((action) => ({
+    name: action.name,
+    expectsSecondThing: !!action.secondObjectTag,
+  }));
 }
 
 export function getViableSecondThingsFor(
@@ -133,9 +99,7 @@ export function getViableSecondThingsFor(
   thingName: string,
   actionName: string
 ) {
-  const action = Object.values(PhysicalWorld.actions).find(
-    (action) => action.name === actionName
-  );
+  const action = actionsByName.get(actionName);
   if (!action) {
     log(`Unrecognised action ${actionName}`);
     return [];
@@ -162,9 +126,7 @@ export function attemptAction(
   actionName: string,
   secondThingName?: string
 ) {
-  const action = Object.values(PhysicalWorld.actions).find(
-    (action) => action.name === actionName
-  );
+  const action = actionsByName.get(actionName);
   if (!action) {
     throw new Error(`Unknown action: ${actionName}`);
   }
@@ -186,7 +148,7 @@ export function attemptAction(
     .filter((thing) => {
       return findRelationship(
         thing,
-        PhysicalWorld.relationships.carriedBy.type,
+        relationshipsByName.get("carriedBy")!.type,
         {
           object: user,
         }
@@ -197,7 +159,7 @@ export function attemptAction(
   return success;
 }
 
-async function loadThings() {
+export async function load(): Promise<World> {
   try {
     const dbText = await fs.readFile(dbPath, {
       encoding: "utf8",
@@ -211,13 +173,23 @@ async function loadThings() {
       }
     });
   } catch {
-    return { things: [], userInventory: [] };
+    const newWorld: World = {
+      things: [],
+      userInventory: [],
+      extensions: [{ extension: PhysicalWorldModule, enabled: false }],
+    };
+    save(newWorld);
+    return newWorld;
   }
 }
 
-async function saveThings(things: Thing[], userInventory: string[]) {
+async function save(world: World) {
   const dbText = stringify(
-    { things, userInventory },
+    {
+      things: world.things,
+      userInventory: world.userInventory,
+      extensions: world.extensions,
+    },
     function replacer(key, value) {
       if (value instanceof Set && key === "kinds") {
         const modifiedValue = [...value].map((s) => s.description);

@@ -16,11 +16,14 @@ export default function ({ alert, setAlert }) {
   const alertElement =
     alert.text && alert.text !== "" ? <p>{titleise(alert.text)}</p> : null;
 
+  const styles = {
+    visibility: alertElement ? "visible" : "hidden",
+  };
+
   return (
     <div
-      className={`panel ${alert.type ? alert.type + "-alert" : ""} ${
-        alertElement ? "" : "hidden"
-      }`}
+      className={`panel ${alert.type ? alert.type + "-alert" : ""}`}
+      style={styles}
     >
       {alertElement}
     </div>

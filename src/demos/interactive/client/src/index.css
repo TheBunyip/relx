@@ -7,12 +7,6 @@ body {
 * {
   font-family: "Courier New", Courier, monospace;
 }
-/* for debugging */
-/* * {
-  
-  user-select: none;
-  outline: 1px solid red;
-} */
 
 .panel {
   background-color: white;
@@ -20,10 +14,6 @@ body {
   box-shadow: 2px 2px 10px #666;
   margin: 20px;
   padding: 20px;
-}
-
-.hidden {
-  visibility: hidden;
 }
 
 .dynamic-panel-elements {
